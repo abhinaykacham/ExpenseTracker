@@ -6,4 +6,8 @@
     <string name="title_notifications">Notifications</string>
     <string name="expense_name">Expense</string>
     <string name="expense_amount">Expense amount</string>
+    <string name="hint_search_for_an_expense">Search for an expense</string>
+    <string name="hint_add_your_annual_expense_here">Add your Annual expense here</string>
+    <string name="hint_add_your_daily_expense_here">Add your daily expense here</string>
+    <string name="hint_list_of_expense_items">List of expense items</string>
 </resources>

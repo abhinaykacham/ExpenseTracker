@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -11,7 +12,6 @@
         style="@android:style/Widget.ProgressBar.Horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
         android:progress="25"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
@@ -30,7 +30,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ems="10"
-        android:hint="Search for an expense"
+        android:hint="@string/hint_search_for_an_expense"
         android:importantForAutofill="no"
         android:inputType="textPersonName"
         android:background="@drawable/text_border"
@@ -41,7 +41,8 @@
         app:layout_constraintTop_toBottomOf="@+id/view"
         app:layout_constraintVertical_bias="0.029" />
 
-    <android.support.v7.widget.RecyclerView
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/expense_list_added_on_a_day"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:fadeScrollbars="false"
@@ -54,4 +55,4 @@
         tools:layout_editor_absoluteX="0dp"
         tools:listitem="@layout/make_model_list"/>
 
-</android.support.constraint.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

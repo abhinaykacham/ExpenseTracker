@@ -1,30 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <android.support.v7.widget.CardView
+    <androidx.cardview.widget.CardView
         android:id="@+id/expense_card_of_a_day"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:layout_editor_absoluteX="0dp">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <TextView
             android:id="@+id/expense_name_of_a_day"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_gravity="left"
-            android:hint="@string/expense_name" />
-
+            android:hint="@string/expense_name"
+            />
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="right"
+            >
         <TextView
             android:id="@+id/expense_amount_of_a_day"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_gravity="right"
             android:hint="@string/expense_amount" />
-    </android.support.v7.widget.CardView>
-</android.support.constraint.ConstraintLayout>
+
+        <ImageView
+            android:id="@+id/edit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/edit" />
+
+        <ImageView
+            android:id="@+id/delete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/delete" />
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+</androidx.constraintlayout.widget.ConstraintLayout>

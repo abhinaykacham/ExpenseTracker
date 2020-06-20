@@ -1,15 +1,15 @@
 package com.expensetracker.ui.home;
 
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProviders;
+import android.widget.ProgressBar;
+
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProviders;
 
 import com.expensetracker.R;
 
@@ -22,13 +22,10 @@ public class HomeFragment extends Fragment {
         homeViewModel =
                 ViewModelProviders.of(this).get(HomeViewModel.class);
         View root = inflater.inflate(R.layout.fragment_home, container, false);
-        final TextView textView = root.findViewById(R.id.text_home);
-        homeViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
-            @Override
-            public void onChanged(@Nullable String s) {
-                textView.setText(s);
-            }
-        });
+        ProgressBar progressBar=root.findViewById(R.id.savingsProgressBar);
+        Resources resources=getResources();
+        progressBar.setProgressDrawable(resources.getDrawable(R.drawable.progress_style));
+        progressBar.setProgress(50);
         return root;
     }
 }
