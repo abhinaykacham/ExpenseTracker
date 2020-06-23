@@ -10,4 +10,22 @@
     <string name="hint_add_your_annual_expense_here">Add your Annual expense here</string>
     <string name="hint_add_your_daily_expense_here">Add your daily expense here</string>
     <string name="hint_list_of_expense_items">List of expense items</string>
+    <string name="nameerror">Name Cannot be empty</string>
+    <string name="emailerror">Enter a valid email address.</string>
+    <string name="mobileerror">Enter a valid phone number</string>
+    <string name="confirmerror">Password doesn\'t match</string>
+    <string name="pwderror">Password should consist of atleast [0–9],[a-z],[A-Z],[@#$%^+=] and min_length is 4.</string>
+    <string name="userexists">Username already exists</string>
+    <string name="userempty">Name cannot be empty</string>
+    <string name="pwdempty">Password cannot be empty</string>
+    <string name="confirmpwdempty">Confirm Password cannot be empty</string>
+    <string name="signup">Signup</string>
+    <string name="login">Login</string>
+    <string name="password">Password</string>
+    <string name="username">Username</string>
+    <string name="retype_password">Retype Password</string>
+    <string name="email">Email</string>
+    <string name="phone">Phone</string>
+    <string name="signup_now">SignUp Now</string>
+    <string name="logout">Logout</string>
 </resources>
