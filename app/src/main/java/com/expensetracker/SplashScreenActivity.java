@@ -10,13 +10,13 @@ import android.view.WindowManager;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class SplashScreenActivity extends AppCompatActivity {
-
+    private DBHelper mydb ;
     private static int SPLASH_SCREEN_TIME_OUT = 2000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        mydb = new DBHelper(this);
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {

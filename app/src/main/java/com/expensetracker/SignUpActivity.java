@@ -14,6 +14,7 @@ import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.basgeekball.awesomevalidation.AwesomeValidation;
 import com.basgeekball.awesomevalidation.ValidationStyle;
@@ -39,15 +40,13 @@ public class SignUpActivity extends AppCompatActivity {
     private AwesomeValidation awesomeValidation;
     private HashMap<String, String> usersMap = new HashMap<>();
     String username = "", password = "",email="",phone="",checkUsr="";
-    private DatabaseReference mFirebaseDatabase;
-    private FirebaseDatabase mFirebaseInstance;
     private Boolean mUserExits=false;
-    String userId="";
-
+    DBHelper mDBHelper;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up);
+        mDBHelper = new DBHelper(this);
         awesomeValidation = new AwesomeValidation(ValidationStyle.BASIC);
         mBtnSignUpNow = (Button) findViewById(R.id.button_signup);
         mTxtUsrName = (EditText) findViewById(R.id.text_usrsignup);
@@ -56,8 +55,6 @@ public class SignUpActivity extends AppCompatActivity {
         mTxtEmail = (EditText) findViewById(R.id.text_email);
         mTxtPhone = (EditText) findViewById(R.id.text_phone);
         context = getApplicationContext();
-        mFirebaseInstance = FirebaseDatabase.getInstance();
-        mFirebaseDatabase = mFirebaseInstance.getReference("users");
         Log.v("SignUp Activity:onCreate", "Checking validation");
         mBtnSignUpNow.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -77,13 +74,14 @@ public class SignUpActivity extends AppCompatActivity {
         if (awesomeValidation.validate()) {
             email=mTxtEmail.getText().toString();
             phone=mTxtPhone.getText().toString();
-            createUser();
+            Boolean insert=mDBHelper.createUser(new User(username,email,password,phone));
+            if(insert)
+                Toast.makeText(this,"User registration successful",Toast.LENGTH_LONG);
+            else
+                Toast.makeText(this,"User registration unsuccessful",Toast.LENGTH_LONG);
 
             Intent main_activity = new Intent(context, LoginActivity.class);
-            usersMap.put(username, password);
-            main_activity.putExtra("usersMap", usersMap);
-            setResult(Activity.RESULT_OK, main_activity);
-            finish();
+            startActivity(main_activity);
         }
     }
 
@@ -94,22 +92,8 @@ public class SignUpActivity extends AppCompatActivity {
         // Custom Validator to check whether the username is unique or not
         awesomeValidation.addValidation(this, R.id.text_usrsignup, new SimpleCustomValidation() {
             @Override
-            public boolean compare(final String input) {
-                mFirebaseDatabase.addValueEventListener(
-                        new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
-                                //Get map of users in datasnapshot
-                                collectUsers((Map<String,Object>) dataSnapshot.getValue(),input);
-                            }
-
-                            @Override
-                            public void onCancelled(DatabaseError databaseError) {
-                                //handle databaseError
-                            }
-                        });
-
-                if (mUserExits)
+            public boolean compare(String input) {
+                if(mDBHelper.getUser(input))
                     return false;
                 else
                     return true;
@@ -138,33 +122,5 @@ public class SignUpActivity extends AppCompatActivity {
         awesomeValidation.addValidation(this, R.id.text_phone, "^[2-9]{1}[0-9]{9}$", R.string.mobileerror);
     }
 
-    /**
-     * Creating new user node under 'users'
-     */
-    private void createUser() {
-        if (TextUtils.isEmpty(userId)) {
-            userId = mFirebaseDatabase.push().getKey();
-        }
-        User user = new User(email, username,password,phone);
-        mFirebaseDatabase.child(userId).setValue(user);
-        //addUserChangeListener();
-    }
 
-    private void collectUsers(Map<String,Object> users,String usrname) {
-
-        ArrayList<String> username = new ArrayList<>();
-
-        //iterate through each user, ignoring their UID
-        for (Map.Entry<String, Object> entry : users.entrySet()){
-
-            //Get user map
-            Map singleUser = (Map) entry.getValue();
-            if(usrname!=null && usrname==singleUser.get("username").toString())
-            {
-                mUserExits= true;
-                return;
-            }
-
-        }
-    }
 }
