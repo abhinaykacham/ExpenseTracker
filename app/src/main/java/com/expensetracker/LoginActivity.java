@@ -20,18 +20,17 @@ import java.util.HashMap;
 
 public class LoginActivity extends AppCompatActivity {
 
+    private DBHelper mDBHelper;
     private EditText mTxtUsrName, mTxtPwd;
     private Button mBtnLogin, mBtnSignUp;
     Context context;
     private AwesomeValidation awesomeValidation;
-    //HashMap is used for storing the username and passwords
-    private HashMap<String, String> usersMap = new HashMap<String, String>();
-    private static final int SIGN_UP_ACTIVITY_REQUEST_CODE = 1, WELCOME_ACTIVITY_REQUEST_CODE = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        mDBHelper = new DBHelper(this);
         awesomeValidation = new AwesomeValidation(ValidationStyle.BASIC);
         mBtnLogin = findViewById(R.id.button_login);
         mBtnSignUp = findViewById(R.id.button_signup);
@@ -44,18 +43,10 @@ public class LoginActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if (awesomeValidation.validate()) {
                     String username = mTxtUsrName.getText().toString().trim();
-                    if (usersMap.containsKey(username)) {
-                        String password = mTxtPwd.getText().toString().trim();
-                        if (usersMap.get(username).equals(password)) {
-                            Intent welcome = new Intent(context, HomeScreen.class);
-                            welcome.putExtra("usersMap", usersMap);
-                            welcome.putExtra("username", username);
-                            Log.v("MainActivity:onCreateMethod", "Verified User");
-                            startActivityForResult(welcome, WELCOME_ACTIVITY_REQUEST_CODE);
-                        } else {
-                            mTxtPwd.setText("");
-                            Toast.makeText(context, "Please enter a valid password", Toast.LENGTH_LONG).show();
-                        }
+                    String password = mTxtPwd.getText().toString().trim();
+                    if (mDBHelper.validateUser(username,password)) {
+                        Intent home = new Intent(context, HomeScreen.class);
+                        startActivity(home);
                     } else {
                         mTxtPwd.setText("");
                         Toast.makeText(context, "Invalid User", Toast.LENGTH_LONG).show();
@@ -66,25 +57,11 @@ public class LoginActivity extends AppCompatActivity {
         mBtnSignUp.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Intent signup = new Intent(context, SignUpActivity.class);
-                signup.putExtra("usersMap", usersMap);
-                startActivityForResult(signup, SIGN_UP_ACTIVITY_REQUEST_CODE);
+                mTxtPwd.setText("");
+                mTxtUsrName.setText("");
+                startActivity(signup);
             }
         });
     }
 
-    // onActivityResult method for processing the results retrieved from different activities.
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-
-        Log.v("MainActivity:onActivityResult", "Received Result");
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == SIGN_UP_ACTIVITY_REQUEST_CODE || requestCode == WELCOME_ACTIVITY_REQUEST_CODE) {
-            if (resultCode == Activity.RESULT_OK) {
-                usersMap.putAll((HashMap<String, String>) data.getSerializableExtra("usersMap"));
-            }
-        }
-        //Clearing the views values
-        mTxtPwd.setText("");
-        mTxtUsrName.setText("");
-    }
 }

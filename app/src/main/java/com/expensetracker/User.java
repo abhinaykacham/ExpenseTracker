@@ -6,9 +6,9 @@ public class User {
     String mPwd;
     String mPhone;
 
-    public User(String email, String username, String pwd, String phone) {
-        mEmail = email;
+    public User(String username, String email, String pwd, String phone) {
         mUsername = username;
+        mEmail = email;
         mPwd = pwd;
         mPhone = phone;
     }
