@@ -1,6 +1,6 @@
 /* Home Fragment which displays saved preferences and user daily expenses*/
 
-package com.expensetracker.ui.home;
+package com.expensetracker.ui.reporting;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -16,17 +16,17 @@ import androidx.lifecycle.ViewModelProviders;
 
 import com.expensetracker.R;
 
-public class HomeFragment extends Fragment {
+public class ReportingFragment extends Fragment {
 
-    private HomeViewModel homeViewModel;
+    private ReportingViewModel mReportingViewModel;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        homeViewModel =
-                ViewModelProviders.of(this).get(HomeViewModel.class);
+        mReportingViewModel =
+                ViewModelProviders.of(this).get(ReportingViewModel.class);
         View root = inflater.inflate(R.layout.fragment_home, container, false);
         final TextView textView = root.findViewById(R.id.text_home);
-        homeViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
+        mReportingViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
             public void onChanged(@Nullable String s) {
                 textView.setText(s);

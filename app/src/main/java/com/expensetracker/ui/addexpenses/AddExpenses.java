@@ -1,6 +1,6 @@
-/* Home Fragment which displays saved preferences and user daily expenses*/
+/* Fragment which provides helps the user for adding daily expenses */
 
-package com.expensetracker.ui.home;
+package com.expensetracker.ui.addexpenses;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -16,17 +16,17 @@ import androidx.lifecycle.ViewModelProviders;
 
 import com.expensetracker.R;
 
-public class HomeFragment extends Fragment {
+public class AddExpenses extends Fragment {
 
-    private HomeViewModel homeViewModel;
+    private AddExpensesViewModel mAddExpensesViewModel;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        homeViewModel =
-                ViewModelProviders.of(this).get(HomeViewModel.class);
-        View root = inflater.inflate(R.layout.fragment_home, container, false);
-        final TextView textView = root.findViewById(R.id.text_home);
-        homeViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
+        mAddExpensesViewModel =
+                ViewModelProviders.of(this).get(AddExpensesViewModel.class);
+        View root = inflater.inflate(R.layout.fragment_addexpenses, container, false);
+        final TextView textView = root.findViewById(R.id.text_addexpenses);
+        mAddExpensesViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
             public void onChanged(@Nullable String s) {
                 textView.setText(s);
