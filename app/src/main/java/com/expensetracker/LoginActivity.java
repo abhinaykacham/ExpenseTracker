@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -45,7 +46,12 @@ public class LoginActivity extends AppCompatActivity {
                     String username = mTxtUsrName.getText().toString().trim();
                     String password = mTxtPwd.getText().toString().trim();
                     if (mDBHelper.validateUser(username,password)) {
-                        Intent home = new Intent(context, HomeScreen.class);
+                        SharedPreferences.Editor editor = getSharedPreferences("expensetracker", MODE_PRIVATE).edit();
+                        editor.putString("username", username);
+                        editor.putString("password", password);
+                        editor.putBoolean("isLoggedIn", true);
+                        editor.apply();
+                        Intent home = new Intent(context, HomeScreenActivity.class);
                         startActivity(home);
                     } else {
                         mTxtPwd.setText("");

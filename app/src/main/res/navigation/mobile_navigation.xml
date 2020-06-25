@@ -3,23 +3,43 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@+id/navigation_home">
+    app:startDestination="@+id/nav_home">
 
     <fragment
-        android:id="@+id/navigation_home"
+        android:id="@+id/nav_home"
         android:name="com.expensetracker.ui.home.HomeFragment"
-        android:label="@string/title_home"
+        android:label="@string/menu_home"
         tools:layout="@layout/fragment_home" />
 
     <fragment
-        android:id="@+id/navigation_dashboard"
-        android:name="com.expensetracker.ui.dashboard.DashboardFragment"
-        android:label="@string/title_dashboard"
-        tools:layout="@layout/fragment_dashboard" />
+        android:id="@+id/nav_addexpenses"
+        android:name="com.expensetracker.ui.addexpenses.AddExpenses"
+        android:label="@string/menu_addexpenses"
+        tools:layout="@layout/fragment_addexpenses" />
 
     <fragment
-        android:id="@+id/navigation_notifications"
-        android:name="com.expensetracker.ui.notifications.NotificationsFragment"
-        android:label="@string/title_notifications"
-        tools:layout="@layout/fragment_profile" />
+        android:id="@+id/nav_reporting"
+        android:name="com.expensetracker.ui.reporting.ReportingFragment"
+        android:label="@string/menu_reporting"
+        tools:layout="@layout/fragment_reporting" />
+
+    <fragment
+        android:id="@+id/nav_updatepassword"
+        android:name="com.expensetracker.ui.updatepassword.UpdatePasswordFragment"
+        android:label="@string/menu_updatepwd"
+        tools:layout="@layout/fragment_updatepassword" />
+
+    <fragment
+        android:id="@+id/nav_help"
+        android:name="com.expensetracker.ui.help.HelpFragment"
+        android:label="@string/menu_help"
+        tools:layout="@layout/fragment_help" />
+
+    <fragment
+        android:id="@+id/nav_about"
+        android:name="com.expensetracker.ui.about.AboutFragment"
+        android:label="@string/menu_about"
+        tools:layout="@layout/fragment_about" />
+
+
 </navigation>
