@@ -47,9 +47,9 @@ public class DBHelper extends SQLiteOpenHelper {
 
     private static final String CREATE_TABLE_SAVED_EXPENSES="CREATE TABLE "
             + SAVED_EXPENSES_TABLE_NAME + "(" + SAVED_EXPENSES_COLUMN_EXPENSE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,"
-            + SAVED_EXPENSES_COLUMN_EXPENSE_NAME  + "TEXT ,"
-            + SAVED_EXPENSES_COLUMN_EXPENSE_AMOUNT + "INTEGER, "
-            + SAVED_EXPENSES_COLUMN_USER + "TEXT,"
+            + SAVED_EXPENSES_COLUMN_EXPENSE_NAME  + " TEXT ,"
+            + SAVED_EXPENSES_COLUMN_EXPENSE_AMOUNT + " INTEGER, "
+            + SAVED_EXPENSES_COLUMN_USER + " TEXT, "
             + " FOREIGN KEY ("+SAVED_EXPENSES_COLUMN_USER+") REFERENCES "+USERS_TABLE_NAME+"("+USERS_COLUMN_USERNAME+"))";
 
 
@@ -57,22 +57,22 @@ public class DBHelper extends SQLiteOpenHelper {
             + USERS_TABLE_NAME + "(" + USERS_COLUMN_USERNAME + " TEXT PRIMARY KEY ,"
             + USERS_COLUMN_EMAIL + " TEXT,"
             + USERS_COLUMN_PWD + " TEXT,"
-            + USERS_COLUMN_PHONE + "TEXT,"
-            + USERS_COLUMN_ANNUAL_INCOME + "INTEGER, "
-            + USERS_COLUMN_MAXIMUM_DAILY_EXPENSE + "INTEGER , "
-            + USERS_COLUMN_DESIRED_SAVING + "INTEGER)";
+            + USERS_COLUMN_PHONE + " TEXT,"
+            + USERS_COLUMN_ANNUAL_INCOME + " INTEGER, "
+            + USERS_COLUMN_MAXIMUM_DAILY_EXPENSE + " INTEGER , "
+            + USERS_COLUMN_DESIRED_SAVING + " INTEGER)";
 
     private static final String CREATE_TABLE_DAILY_EXPENSES = "CREATE TABLE "
             + DAILY_EXPENSES_TABLE_NAME + "(" + DAILY_EXPENSES_COLUMN_EXPENSE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,"
-            + DAILY_EXPENSES_COLUMN_CREATED_DATE  + "TEXT ,"
-            + DAILY_EXPENSES_COLUMN_SAVED_EXPENSE_ID + "INTEGER "
-            + DAILY_EXPENSES_COLUMN_AMOUNT + "INTEGER,"
+            + DAILY_EXPENSES_COLUMN_CREATED_DATE  + " TEXT ,"
+            + DAILY_EXPENSES_COLUMN_SAVED_EXPENSE_ID + " INTEGER, "
+            + DAILY_EXPENSES_COLUMN_AMOUNT + " INTEGER,"
             + " FOREIGN KEY ("+DAILY_EXPENSES_COLUMN_SAVED_EXPENSE_ID+") " +
               " REFERENCES "+SAVED_EXPENSES_TABLE_NAME+" ( "+SAVED_EXPENSES_COLUMN_EXPENSE_ID+"))";
 
 
     public DBHelper(Context context) {
-        super(context, DATABASE_NAME , null, 4);
+        super(context, DATABASE_NAME , null, 1);
     }
 
     @Override
@@ -86,9 +86,9 @@ public class DBHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // TODO Auto-generated method stub
-        db.execSQL("DROP TABLE IF EXISTS " + USERS_TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + DAILY_EXPENSES_TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + SAVED_EXPENSES_TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + USERS_TABLE_NAME);
         onCreate(db);
     }
 
