@@ -5,12 +5,18 @@ public class User {
     String mUsername;
     String mPwd;
     String mPhone;
-
+    int annualIncome;
+    int desiredSaving;
+    int maximumDailyExpense;
     public User(String username, String email, String pwd, String phone) {
         mUsername = username;
         mEmail = email;
         mPwd = pwd;
         mPhone = phone;
+    }
+
+    public User() {
+
     }
 
     public void setEmail(String email) {
@@ -46,5 +52,27 @@ public class User {
         return mPhone;
     }
 
+    public int getAnnualIncome() {
+        return annualIncome;
+    }
 
+    public void setAnnualIncome(int annualIncome) {
+        this.annualIncome = annualIncome;
+    }
+
+    public int getDesiredSaving() {
+        return desiredSaving;
+    }
+
+    public void setDesiredSaving(int desiredSaving) {
+        this.desiredSaving = desiredSaving;
+    }
+
+    public int getMaximumDailyExpense() {
+        return maximumDailyExpense;
+    }
+
+    public void setMaximumDailyExpense(int maximumDailyExpense) {
+        this.maximumDailyExpense = maximumDailyExpense;
+    }
 }

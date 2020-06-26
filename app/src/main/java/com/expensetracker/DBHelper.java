@@ -188,14 +188,15 @@ public class DBHelper extends SQLiteOpenHelper {
      * of @param username
      * @return true if successful and vice versa
      */
-    public boolean updateFinances(String username,int annualIncome,int desiredSaving){
+    public boolean updateFinances(String username,int annualIncome,int desiredSaving, int maximumDailyExpense){
         boolean result=false;
         SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
 
         final String updateAmounts="UPDATE " + USERS_TABLE_NAME + " SET "
-                +USERS_COLUMN_ANNUAL_INCOME + " = " + annualIncome
-                +USERS_COLUMN_DESIRED_SAVING+ " = " + desiredSaving
-                +"WHERE " + USERS_COLUMN_USERNAME + " = '" +username + "'";
+                +USERS_COLUMN_ANNUAL_INCOME + " = " + annualIncome + " , "
+                +USERS_COLUMN_DESIRED_SAVING+ " = " + desiredSaving+ " , "
+                +USERS_COLUMN_MAXIMUM_DAILY_EXPENSE + " = " + maximumDailyExpense + " "
+                +" WHERE " + USERS_COLUMN_USERNAME + " = '" +username + "'";
         Cursor c = sqLiteDatabase.rawQuery(updateAmounts, null);
 
         if (c != null && (c.getCount() > 0)) {
