@@ -331,15 +331,27 @@ public class DBHelper extends SQLiteOpenHelper {
      * @return
      */
     public List<Expense> fetchDailyExpense(String username,String date){
+        /*select daily_expenses.daily_expense_id
+        ,daily_expenses.expense_amount
+        ,daily_expenses.created_date
+        ,saved_expenses.expense_name
+        from saved_expenses,daily_expenses
+        where daily_expenses.saved_expense_id=saved_expenses.saved_expense_id
+        and saved_expenses.username=username*/
         List<Expense> dailyExpensesList= new ArrayList<>();
         SQLiteDatabase sqLiteDatabase=this.getReadableDatabase();
-        final String selectExpense="SELECT * FROM "+DAILY_EXPENSES_TABLE_NAME
-                +" WHERE "
-                + DAILY_EXPENSES_COLUMN_CREATED_DATE + " = '" + date + "'"
-                + " AND "
-                + DAILY_EXPENSES_COLUMN_SAVED_EXPENSE_ID
-                + " IN ( SELECT " + SAVED_EXPENSES_COLUMN_EXPENSE_ID + " FROM " + SAVED_EXPENSES_TABLE_NAME
-                + " WHERE " + SAVED_EXPENSES_COLUMN_USER + " = '" + username +"')";
+        final String selectExpense="SELECT "
+                + DAILY_EXPENSES_TABLE_NAME+"."+DAILY_EXPENSES_COLUMN_EXPENSE_ID+" , "
+                + DAILY_EXPENSES_TABLE_NAME+"."+DAILY_EXPENSES_COLUMN_AMOUNT+" , "
+                + DAILY_EXPENSES_TABLE_NAME+"."+DAILY_EXPENSES_COLUMN_CREATED_DATE+" , "
+                + SAVED_EXPENSES_TABLE_NAME+"."+SAVED_EXPENSES_COLUMN_EXPENSE_NAME+" , "
+                + DAILY_EXPENSES_TABLE_NAME+"."+DAILY_EXPENSES_COLUMN_SAVED_EXPENSE_ID
+                + " FROM "+ DAILY_EXPENSES_TABLE_NAME
+                + " , " + SAVED_EXPENSES_TABLE_NAME
+                + " WHERE " + SAVED_EXPENSES_TABLE_NAME+ "." +SAVED_EXPENSES_COLUMN_USER+ " = '" + username +"'"
+                + " AND " + SAVED_EXPENSES_TABLE_NAME +"."+SAVED_EXPENSES_COLUMN_EXPENSE_ID
+                + " = " +DAILY_EXPENSES_TABLE_NAME+"."+DAILY_EXPENSES_COLUMN_SAVED_EXPENSE_ID;
+
 
         Cursor cursor=sqLiteDatabase.rawQuery(selectExpense,null);
         if (cursor.moveToFirst()){
@@ -349,6 +361,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 dailyExpenses.setSavedExpenseID(cursor.getInt(cursor.getColumnIndex(DAILY_EXPENSES_COLUMN_SAVED_EXPENSE_ID)));
                 dailyExpenses.setCreatedDate(cursor.getString(cursor.getColumnIndex(DAILY_EXPENSES_COLUMN_CREATED_DATE)));
                 dailyExpenses.setExpenseAmount(cursor.getInt(cursor.getColumnIndex(DAILY_EXPENSES_COLUMN_AMOUNT)));
+                dailyExpenses.setExpenseName(cursor.getString(cursor.getColumnIndex(SAVED_EXPENSES_COLUMN_EXPENSE_NAME)));
                 dailyExpensesList.add(dailyExpenses);
             }while(cursor.moveToNext());
         }

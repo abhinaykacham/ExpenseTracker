@@ -22,12 +22,15 @@ public class ListOfExpensesAdapter extends RecyclerView.Adapter<ListOfExpensesAd
     DBHelper dbHelper;
     HomeScreenActivity homeScreenActivity;
 
-    public ListOfExpensesAdapter(HomeScreenActivity homeScreenActivity) {
+    public ListOfExpensesAdapter(HomeScreenActivity homeScreenActivity,boolean isDailyExpenseList) {
         this.homeScreenActivity = homeScreenActivity;
         dbHelper=new DBHelper(homeScreenActivity);
         sharedPreferences=homeScreenActivity.getSharedPreferences("expensetracker", Context.MODE_PRIVATE);
         username=sharedPreferences.getString("username","");
-        expensesList=dbHelper.fetchSavedExpense(username);
+        if(isDailyExpenseList)
+            expensesList=dbHelper.fetchDailyExpense(username);
+        else
+            expensesList=dbHelper.fetchSavedExpense(username);
     }
 
     @NonNull

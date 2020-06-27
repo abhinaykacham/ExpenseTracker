@@ -68,4 +68,9 @@ public class Expense {
     public void setDailyExpenseID(int dailyExpenseID) {
         this.dailyExpenseID = dailyExpenseID;
     }
+
+    @Override
+    public String toString() {
+        return expenseName;
+    }
 }

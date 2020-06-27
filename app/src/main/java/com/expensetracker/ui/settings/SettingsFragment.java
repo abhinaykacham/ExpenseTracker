@@ -42,6 +42,7 @@ public class SettingsFragment extends Fragment {
     String username;
     User userDetails;
     List<Expense> expenseList;
+    boolean dailyExpense=false;
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
 
@@ -94,6 +95,6 @@ public class SettingsFragment extends Fragment {
         mEdtDesiredSaving.setText(String.valueOf(userDetails.getDesiredSaving()));
         mEdtAnnualIncome.setText(String.valueOf(userDetails.getAnnualIncome()));
         mEdtMaximumDailyExpense.setText(String.valueOf(userDetails.getMaximumDailyExpense()));
-        savedExpensesRecyclerView.setAdapter(new ListOfExpensesAdapter((HomeScreenActivity) getActivity()));
+        savedExpensesRecyclerView.setAdapter(new ListOfExpensesAdapter((HomeScreenActivity) getActivity(),dailyExpense));
     }
 }
