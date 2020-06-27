@@ -13,9 +13,9 @@
 
     <fragment
         android:id="@+id/nav_addexpenses"
-        android:name="com.expensetracker.ui.addexpenses.AddExpenses"
-        android:label="@string/menu_addexpenses"
-        tools:layout="@layout/fragment_addexpenses" />
+        android:name="com.expensetracker.ui.settings.SettingsFragment"
+        android:label="@string/menu_settings"
+        tools:layout="@layout/fragment_settings" />
 
     <fragment
         android:id="@+id/nav_reporting"
