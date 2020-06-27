@@ -231,13 +231,13 @@ public class DBHelper extends SQLiteOpenHelper {
      * @param dailyExpense of the user
      * @return true if expense is added, false if expense could not be added/
      */
-    public boolean addDailyExpense(DailyExpenses dailyExpense){
+    public boolean addDailyExpense(Expense dailyExpense){
         SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
         values.put(DAILY_EXPENSES_COLUMN_AMOUNT, dailyExpense.getExpenseAmount());
         values.put(DAILY_EXPENSES_COLUMN_CREATED_DATE,dailyExpense.getCreatedDate());
-        values.put(DAILY_EXPENSES_COLUMN_SAVED_EXPENSE_ID,dailyExpense.getSaveExpenseID());
+        values.put(DAILY_EXPENSES_COLUMN_SAVED_EXPENSE_ID,dailyExpense.getSavedExpenseID());
         // insert row
         long status = sqLiteDatabase.insert(DAILY_EXPENSES_TABLE_NAME, null, values);
 
@@ -272,7 +272,7 @@ public class DBHelper extends SQLiteOpenHelper {
      * @param dailyExpenses
      * @return number of rows affected
      */
-    public int updateDailyExpenses(DailyExpenses dailyExpenses){
+    public int updateExpense(Expense dailyExpenses){
         SQLiteDatabase sqLiteDatabase=this.getWritableDatabase();
         ContentValues contentValues=new ContentValues();
         contentValues.put(DAILY_EXPENSES_COLUMN_AMOUNT,dailyExpenses.getExpenseAmount());
@@ -329,10 +329,10 @@ public class DBHelper extends SQLiteOpenHelper {
      * @param username created on @param date
      * @return
      */
-    public List<DailyExpenses> fetchDailyExpense(String username,String date){
-        List<DailyExpenses> dailyExpensesList= new ArrayList<>();
+    public List<Expense> fetchDailyExpense(String username,String date){
+        List<Expense> dailyExpensesList= new ArrayList<>();
         SQLiteDatabase sqLiteDatabase=this.getReadableDatabase();
-        final String selectDailyExpenses="SELECT * FROM "+DAILY_EXPENSES_TABLE_NAME
+        final String selectExpense="SELECT * FROM "+DAILY_EXPENSES_TABLE_NAME
                 +" WHERE "
                 + DAILY_EXPENSES_COLUMN_CREATED_DATE + " = '" + date + "'"
                 + " AND "
@@ -340,12 +340,12 @@ public class DBHelper extends SQLiteOpenHelper {
                 + " IN ( SELECT " + SAVED_EXPENSES_COLUMN_EXPENSE_ID + " FROM " + SAVED_EXPENSES_TABLE_NAME
                 + " WHERE " + SAVED_EXPENSES_COLUMN_USER + " = '" + username +"')";
 
-        Cursor cursor=sqLiteDatabase.rawQuery(selectDailyExpenses,null);
+        Cursor cursor=sqLiteDatabase.rawQuery(selectExpense,null);
         if (cursor.moveToFirst()){
             do{
-                DailyExpenses dailyExpenses=new DailyExpenses();
+                Expense dailyExpenses=new Expense();
                 dailyExpenses.setDailyExpenseID(cursor.getInt(cursor.getColumnIndex(DAILY_EXPENSES_COLUMN_EXPENSE_ID)));
-                dailyExpenses.setSaveExpenseID(cursor.getInt(cursor.getColumnIndex(DAILY_EXPENSES_COLUMN_SAVED_EXPENSE_ID)));
+                dailyExpenses.setSavedExpenseID(cursor.getInt(cursor.getColumnIndex(DAILY_EXPENSES_COLUMN_SAVED_EXPENSE_ID)));
                 dailyExpenses.setCreatedDate(cursor.getString(cursor.getColumnIndex(DAILY_EXPENSES_COLUMN_CREATED_DATE)));
                 dailyExpenses.setExpenseAmount(cursor.getInt(cursor.getColumnIndex(DAILY_EXPENSES_COLUMN_AMOUNT)));
                 dailyExpensesList.add(dailyExpenses);
@@ -361,7 +361,7 @@ public class DBHelper extends SQLiteOpenHelper {
      * @param username that are added today
      * @return
      */
-    public List<DailyExpenses> fetchDailyExpense(String username) {
+    public List<Expense> fetchDailyExpense(String username) {
         DateFormat dateFormat=new SimpleDateFormat("dd/MM/yyyy");
         String today= dateFormat.format(Calendar.getInstance().getTime());
         return fetchDailyExpense(username,today);
