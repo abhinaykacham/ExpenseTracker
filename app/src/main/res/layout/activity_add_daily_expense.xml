@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.home.AddDailyExpenseActivity">
+
+
+    <Spinner
+        android:id="@+id/spinner_dailyexpense"
+        android:layout_width="212dp"
+        android:layout_height="52dp"
+        android:layout_marginStart="31dp"
+        android:layout_marginTop="61dp"
+        android:overlapAnchor="false"
+        android:padding="5dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/text_dailyexpenseamount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="31dp"
+        android:layout_marginTop="36dp"
+        android:ems="10"
+        android:hint="@string/daily_expense_amount"
+        android:inputType="numberDecimal"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/spinner_dailyexpense" />
+
+    <Button
+        android:id="@+id/button_adddailyexpense"
+        android:layout_width="127dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="67dp"
+        android:layout_marginTop="46dp"
+        android:background="@drawable/roundedbutton"
+        android:text="@string/add_expense"
+        android:textColor="@color/textTitle"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/text_dailyexpenseamount" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
