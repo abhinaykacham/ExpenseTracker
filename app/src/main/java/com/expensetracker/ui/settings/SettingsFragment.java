@@ -13,10 +13,12 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.expensetracker.DBHelper;
 import com.expensetracker.R;
 import com.expensetracker.User;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -27,7 +29,8 @@ public class SettingsFragment extends Fragment {
     EditText mEdtAnnualIncome;
     EditText mEdtMaximumDailyExpense;
     Button   mBtnSubmitFinances;
-
+    RecyclerView savedExpensesRecyclerView;
+    FloatingActionButton addSavedExpenseButton;
     private SharedPreferences prefs;
     String username;
     User userDetails;
@@ -35,6 +38,8 @@ public class SettingsFragment extends Fragment {
                              ViewGroup container, Bundle savedInstanceState) {
 
         View root = inflater.inflate(R.layout.fragment_settings, container, false);
+        savedExpensesRecyclerView=root.findViewById(R.id.saved_expense_list);
+        addSavedExpenseButton=root.findViewById(R.id.add_saved_expense);
         mDBHelper = new DBHelper(getContext());
         mEdtAnnualIncome=root.findViewById(R.id.m_edt_annual_income);
         mEdtDesiredSaving=root.findViewById(R.id.m_edt_desired_saving);
@@ -59,6 +64,10 @@ public class SettingsFragment extends Fragment {
                     Toast.makeText(getContext(),"Update is successful",Toast.LENGTH_LONG).show();
                 else
                     Toast.makeText(getContext(),"Update failed",Toast.LENGTH_LONG).show();
+                userDetails=mDBHelper.fetchUserDetails(username);
+                mEdtDesiredSaving.setText(String.valueOf(userDetails.getDesiredSaving()));
+                mEdtAnnualIncome.setText(String.valueOf(userDetails.getAnnualIncome()));
+                mEdtMaximumDailyExpense.setText(String.valueOf(userDetails.getMaximumDailyExpense()));
             }
         });
 

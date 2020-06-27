@@ -40,14 +40,7 @@ public class HomeScreenActivity extends AppCompatActivity {
         setSupportActionBar(mToolbar);
 
         //If Required use floating action button for some action
-        mFloatingActionButton = findViewById(R.id.fab);
-        mFloatingActionButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+
         mDrawerLayoutDrawer = findViewById(R.id.drawer_layout);
         mNavigationView = findViewById(R.id.nav_view);
         // Passing each menu ID as a set of Ids because each
