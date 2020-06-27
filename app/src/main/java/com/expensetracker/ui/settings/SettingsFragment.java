@@ -2,6 +2,7 @@
 
 package com.expensetracker.ui.settings;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -68,6 +69,12 @@ public class SettingsFragment extends Fragment {
                 mEdtDesiredSaving.setText(String.valueOf(userDetails.getDesiredSaving()));
                 mEdtAnnualIncome.setText(String.valueOf(userDetails.getAnnualIncome()));
                 mEdtMaximumDailyExpense.setText(String.valueOf(userDetails.getMaximumDailyExpense()));
+            }
+        });
+
+        addSavedExpenseButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                startActivity(new Intent(getActivity(), AddExpenseActivity.class));
             }
         });
 
