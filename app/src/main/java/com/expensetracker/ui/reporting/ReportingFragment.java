@@ -10,26 +10,43 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.viewpager.widget.ViewPager;
 
 import com.expensetracker.R;
+import com.google.android.material.tabs.TabLayout;
 
 public class ReportingFragment extends Fragment {
 
-    private ReportingViewModel mReportingViewModel;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        mReportingViewModel =
-                ViewModelProviders.of(this).get(ReportingViewModel.class);
+
         View root = inflater.inflate(R.layout.fragment_reporting, container, false);
-        final TextView textView = root.findViewById(R.id.text_reporting);
-        mReportingViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
+        TabLayout tabLayout = (TabLayout) root.findViewById(R.id.tab_layout);
+        tabLayout.addTab(tabLayout.newTab().setText("Daily Expenses"));
+        tabLayout.addTab(tabLayout.newTab().setText("Daily Savings"));
+        tabLayout.addTab(tabLayout.newTab().setText("Item Expenses"));
+        tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
+        final ViewPager viewPager =(ViewPager)root.findViewById(R.id.view_pager);
+        FragmentCollectionPagerAdapter tabsAdapter = new FragmentCollectionPagerAdapter(this.getActivity().getSupportFragmentManager(), tabLayout.getTabCount());
+        viewPager.setAdapter(tabsAdapter);
+        viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
+        tabLayout.setOnTabSelectedListener(new TabLayout.BaseOnTabSelectedListener() {
             @Override
-            public void onChanged(@Nullable String s) {
-                textView.setText(s);
+            public void onTabSelected(TabLayout.Tab tab) {
+                viewPager.setCurrentItem(tab.getPosition());
+            }
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+
+            }
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
             }
         });
         return root;
