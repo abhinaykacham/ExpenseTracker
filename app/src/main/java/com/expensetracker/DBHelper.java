@@ -279,11 +279,22 @@ public class DBHelper extends SQLiteOpenHelper {
      */
     public int updateExpense(Expense dailyExpenses){
         SQLiteDatabase sqLiteDatabase=this.getWritableDatabase();
-        ContentValues contentValues=new ContentValues();
+       /* ContentValues contentValues=new ContentValues();
         contentValues.put(DAILY_EXPENSES_COLUMN_AMOUNT,dailyExpenses.getExpenseAmount());
         return sqLiteDatabase.update(DAILY_EXPENSES_TABLE_NAME,contentValues,
-                DAILY_EXPENSES_COLUMN_EXPENSE_ID+" = "+dailyExpenses.getDailyExpenseID(),
-                null);
+                DAILY_EXPENSES_COLUMN_EXPENSE_ID+" = ?",
+                new String[]{Integer.toString(dailyExpenses.getDailyExpenseID())});*/
+        int result=1;
+        final String updateDailyExpenses="UPDATE " + DAILY_EXPENSES_TABLE_NAME + " SET "
+                + DAILY_EXPENSES_COLUMN_AMOUNT + " = " + dailyExpenses.getExpenseAmount()
+                + " WHERE " + DAILY_EXPENSES_COLUMN_EXPENSE_ID + " = " + dailyExpenses.getDailyExpenseID();
+        Cursor c=sqLiteDatabase.rawQuery(updateDailyExpenses,null);
+        if (c != null) {
+            if (c.getCount() > 0) {
+                result=c.getCount();
+            }
+        }
+        return result;
     }
 
     /**

@@ -22,7 +22,7 @@ import com.expensetracker.R;
 import com.expensetracker.ui.settings.AddExpenseActivity;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-public class HomeFragment extends Fragment {
+public class HomeFragment extends Fragment{
 
     FloatingActionButton addDailyExpenseButton;
     RecyclerView dailyExpensesRecyclerView;
@@ -49,4 +49,5 @@ public class HomeFragment extends Fragment {
         super.onResume();
         dailyExpensesRecyclerView.setAdapter(new ListOfExpensesAdapter((HomeScreenActivity) getActivity(),dailyExpense));
     }
+
 }
