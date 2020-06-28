@@ -1,6 +1,7 @@
 package com.expensetracker;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +13,9 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.expensetracker.ui.home.AddDailyExpenseActivity;
+
+import java.io.Serializable;
 import java.util.List;
 
 public class ListOfExpensesAdapter extends RecyclerView.Adapter<ListOfExpensesAdapter.ViewHolder>
@@ -42,11 +46,21 @@ public class ListOfExpensesAdapter extends RecyclerView.Adapter<ListOfExpensesAd
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Expense expense=expensesList.get(holder.getAdapterPosition());
+    public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
+        final Expense expense=expensesList.get(holder.getAdapterPosition());
         holder.expenseName.setText(expense.getExpenseName());
         holder.expenseAmount.setText(String.valueOf(expense.getExpenseAmount()));
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
 
+                Context context = v.getContext();
+                Intent intent = new Intent(context, AddDailyExpenseActivity.class);
+                intent.putExtra("SAVED_EXPENSE",expense.getExpenseName() );
+                intent.putExtra("SAVED_EXPENSE_AMOUNT",expense.getExpenseAmount() );
+                context.startActivity(intent);
+            }
+        });
     }
 
     @Override
@@ -63,7 +77,6 @@ public class ListOfExpensesAdapter extends RecyclerView.Adapter<ListOfExpensesAd
             expenseName=itemView.findViewById(R.id.expense_amount);
             expenseEntry=itemView.findViewById(R.id.cv_layout);
         }
-
 
     }
 }

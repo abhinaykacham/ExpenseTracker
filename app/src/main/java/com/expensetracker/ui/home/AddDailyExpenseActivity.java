@@ -37,6 +37,7 @@ public class AddDailyExpenseActivity extends AppCompatActivity {
     DateFormat dateFormat;
     String date;
     boolean result;
+    boolean update=false;
     String TAG=this.getClass().getName();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,11 +61,28 @@ public class AddDailyExpenseActivity extends AppCompatActivity {
         mDailyExpenseSpinner.setAdapter(mDailyExpenseAdapter);
         mDailyExpenseSpinner.setPrompt("Select Expense Type");
         mDailyExpenseSpinner.setSelection(0);
+        String mExpenseName =  getIntent().getStringExtra("SAVED_EXPENSE");
+        String mExpenseAmount = Integer.toString(getIntent().getIntExtra("SAVED_EXPENSE_AMOUNT",0));
+        if(mExpenseName!=null && mExpenseAmount!=null){
+            //mDailyExpenseSpinner.setSelection(0);
+            //mDailyExpenseSpinner.setEnabled(false);
+            int counter=0;
+            for(Expense expense:mDailyExpenseArrayList){
+                if(expense.getExpenseName().equals(mExpenseName)){
+                    mDailyExpenseSpinner.setSelection(counter);
+                    mDailyExpenseSpinner.setEnabled(false);
+                    mDailyExpenseAmount.setText(mExpenseAmount);
+                    expense.setExpenseAmount(Integer.parseInt(mExpenseAmount));
+                    update =true;
+                }
+                counter++;
+            }
+        }
         mDailyExpenseSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 Expense selectedExpense=(Expense) parent.getSelectedItem();
-                mDailyExpenseAmount.setText(selectedExpense.getExpenseAmount());
+                mDailyExpenseAmount.setText(Integer.toString(selectedExpense.getExpenseAmount()));
             }
 
             @Override
@@ -78,24 +96,38 @@ public class AddDailyExpenseActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 expenseType=(Expense)mDailyExpenseSpinner.getSelectedItem();
-                dailyExpense=new Expense();
-                dailyExpense.setSavedExpenseID(expenseType.getSavedExpenseID());
-                dailyExpense.setExpenseAmount(Integer.valueOf(String.valueOf(mDailyExpenseAmount.getText())));
-                dailyExpense.setCreatedDate(date);
-                result=mDBHelper.addDailyExpense(dailyExpense);
-                if(result){
-                    Log.d(TAG,"Daily expense added!!");
-                    onBackPressed();
+                if(update){
+                    expenseType.setExpenseAmount(Integer.valueOf(String.valueOf(mDailyExpenseAmount.getText())));
+                    int status = mDBHelper.updateExpense(expenseType);
+                    if (status>0) {
+                        Log.d(TAG, "Daily expense updated!!");
+                        onBackPressed();
+                    } else {
+                        Toast.makeText(
+                                getApplicationContext()
+                                , "Expense Update failed"
+                                , Toast.LENGTH_LONG
+                        ).show();
+                        Log.d(TAG, "Expense Update failed");
+                    }
+                } else {
+                    dailyExpense = new Expense();
+                    dailyExpense.setSavedExpenseID(expenseType.getSavedExpenseID());
+                    dailyExpense.setExpenseAmount(Integer.valueOf(String.valueOf(mDailyExpenseAmount.getText())));
+                    dailyExpense.setCreatedDate(date);
+                    result = mDBHelper.addDailyExpense(dailyExpense);
+                    if (result) {
+                        Log.d(TAG, "Daily expense added!!");
+                        onBackPressed();
+                    } else {
+                        Toast.makeText(
+                                getApplicationContext()
+                                , "Expense addition failed"
+                                , Toast.LENGTH_LONG
+                        ).show();
+                        Log.d(TAG, "Expense addition failed");
+                    }
                 }
-                else {
-                    Toast.makeText(
-                            getApplicationContext()
-                            , "Expense addition failed"
-                            , Toast.LENGTH_LONG
-                    ).show();
-                    Log.d(TAG,"Expense addition failed");
-                }
-
             }
         });
 
