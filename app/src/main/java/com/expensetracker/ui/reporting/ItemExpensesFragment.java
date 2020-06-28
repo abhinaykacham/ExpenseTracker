@@ -1,5 +1,8 @@
 package com.expensetracker.ui.reporting;
 
+import android.app.DatePickerDialog;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -8,7 +11,19 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.anychart.AnyChart;
+import com.anychart.AnyChartView;
+import com.anychart.chart.common.dataentry.DataEntry;
+import com.anychart.chart.common.dataentry.ValueDataEntry;
+import com.anychart.charts.Cartesian;
+import com.anychart.core.cartesian.series.Column;
+import com.expensetracker.ChartDataUnit;
+import com.expensetracker.DBHelper;
 import com.expensetracker.R;
+
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -26,6 +41,14 @@ public class ItemExpensesFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
+
+    private AnyChartView anyChartView;
+    Column column;
+
+    DatePickerDialog picker;
+    DBHelper mDBHelper;
+    SharedPreferences sharedPreferences;
+    List<ChartDataUnit> chartDataUnits;
     public ItemExpensesFragment() {
         // Required empty public constructor
     }
@@ -61,6 +84,26 @@ public class ItemExpensesFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_item_expenses, container, false);
+        View root  = inflater.inflate(R.layout.fragment_item_expenses, container, false);
+        Cartesian cartesian = AnyChart.column();
+
+
+        mDBHelper = new DBHelper(getContext());
+        sharedPreferences=getActivity().getSharedPreferences("expensetracker", Context.MODE_PRIVATE);
+
+        try {
+            //TODO: Change inputs to dynamic in DD/MM/YYYY format
+            chartDataUnits=mDBHelper.fetchItemizedReport("26/06/2020","28/06/2020",sharedPreferences.getString("username",""));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        List<DataEntry> data = new ArrayList<>();
+        for(ChartDataUnit chartDataUnit:chartDataUnits) {
+            data.add(new ValueDataEntry(chartDataUnit.getExpenseName(), chartDataUnit.getExpenseAmount()));
+        }
+        column=cartesian.column(data);
+        anyChartView=root.findViewById(R.id.itemized_chart);
+        anyChartView.setChart(cartesian);
+        return root;
     }
 }

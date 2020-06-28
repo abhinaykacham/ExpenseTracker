@@ -2,6 +2,7 @@
 
 package com.expensetracker;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -43,7 +44,8 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String DAILY_EXPENSES_COLUMN_CREATED_DATE="created_date";
     public static final String DAILY_EXPENSES_COLUMN_SAVED_EXPENSE_ID="saved_expense_id";
     public static final String DAILY_EXPENSES_COLUMN_AMOUNT="expense_amount";
-
+    DateFormat dateFormat;
+    DateFormat dateComparisionFormat;
 
     private static final String CREATE_TABLE_SAVED_EXPENSES="CREATE TABLE "
             + SAVED_EXPENSES_TABLE_NAME + "(" + SAVED_EXPENSES_COLUMN_EXPENSE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,"
@@ -74,6 +76,8 @@ public class DBHelper extends SQLiteOpenHelper {
 
     public DBHelper(Context context) {
         super(context, DATABASE_NAME , null, 1);
+        dateFormat=new SimpleDateFormat("dd/MM/yyyy");
+        dateComparisionFormat=new SimpleDateFormat("yyyyMMdd");
     }
 
     @Override
@@ -376,7 +380,6 @@ public class DBHelper extends SQLiteOpenHelper {
      * @return
      */
     public List<Expense> fetchDailyExpense(String username) {
-        DateFormat dateFormat=new SimpleDateFormat("dd/MM/yyyy");
         String today= dateFormat.format(Calendar.getInstance().getTime());
         return fetchDailyExpense(username,today);
     }
@@ -403,4 +406,125 @@ public class DBHelper extends SQLiteOpenHelper {
         cursor.close();
         return user;
     }
+
+    public List<ChartDataUnit> fetchItemizedReport(String fromDate, String toDate, String username) throws ParseException {
+        /*
+        select sum(daily_expenses.expense_amount),saved_expenses.expense_name
+        from saved_expenses,daily_expenses
+        where daily_expenses.saved_expense_id=saved_expenses.saved_expense_id
+        and saved_expenses.username='abhi'
+        group by daily_expenses.saved_expense_id
+         having substr(daily_expenses.created_date,7)||substr(daily_expenses.created_date,1,2)||substr(daily_expenses.created_date,4,2)
+           between '20202606' and '20202806'
+         */
+
+        List<ChartDataUnit> chartDataUnits=new ArrayList<>();
+        SQLiteDatabase sqLiteDatabase=this.getReadableDatabase();
+        String fromDateFormatted=dateComparisionFormat.format(dateFormat.parse(fromDate));
+        String toDateFormatted=dateComparisionFormat.format(dateFormat.parse(toDate));
+        ChartDataUnit chartDataUnit;
+        final String fetchChartData="SELECT "
+                + "SUM("+DAILY_EXPENSES_TABLE_NAME+"."+DAILY_EXPENSES_COLUMN_AMOUNT+") , "
+                + SAVED_EXPENSES_TABLE_NAME+"."+SAVED_EXPENSES_COLUMN_EXPENSE_NAME
+                + " FROM "+ DAILY_EXPENSES_TABLE_NAME
+                + " , " + SAVED_EXPENSES_TABLE_NAME
+                + " WHERE " + SAVED_EXPENSES_TABLE_NAME+ "." +SAVED_EXPENSES_COLUMN_USER+ " = '" + username +"'"
+                + " AND " + SAVED_EXPENSES_TABLE_NAME +"."+SAVED_EXPENSES_COLUMN_EXPENSE_ID
+                + " = " +DAILY_EXPENSES_TABLE_NAME+"."+DAILY_EXPENSES_COLUMN_SAVED_EXPENSE_ID
+                + " GROUP BY " + DAILY_EXPENSES_TABLE_NAME+"."+DAILY_EXPENSES_COLUMN_SAVED_EXPENSE_ID
+                + " HAVING" + " SUBSTR("+DAILY_EXPENSES_TABLE_NAME +"."+DAILY_EXPENSES_COLUMN_CREATED_DATE+",7)||"
+                + " SUBSTR("+DAILY_EXPENSES_TABLE_NAME +"."+DAILY_EXPENSES_COLUMN_CREATED_DATE+",4,2)||"
+                + " SUBSTR("+DAILY_EXPENSES_TABLE_NAME +"."+DAILY_EXPENSES_COLUMN_CREATED_DATE+",1,2) "
+                + " BETWEEN "
+                + "'"+fromDateFormatted+ "'"
+                + " AND "
+                + "'"+toDateFormatted+ "'";
+        Cursor cursor=sqLiteDatabase.rawQuery(fetchChartData,null);
+        if (cursor.moveToFirst()){
+            do{
+            chartDataUnit=new ChartDataUnit();
+            chartDataUnit.setExpenseName(cursor.getString(cursor.getColumnIndex(SAVED_EXPENSES_COLUMN_EXPENSE_NAME)));
+            chartDataUnit.setExpenseAmount(cursor.getInt(0));
+            chartDataUnits.add(chartDataUnit);
+            }while(cursor.moveToNext());
+
+        }
+        cursor.close();
+        return chartDataUnits;
+    }
+
+    public List<ChartDataUnit> fetchDailySavingsReport(String fromDate,String toDate,String username) throws ParseException {
+        List<ChartDataUnit> chartDataUnits=new ArrayList<>();
+        String fromDateFormatted=dateComparisionFormat.format(dateFormat.parse(fromDate));
+        String toDateFormatted=dateComparisionFormat.format(dateFormat.parse(toDate));
+        SQLiteDatabase sqLiteDatabase=this.getReadableDatabase();
+        ChartDataUnit chartDataUnit;
+
+        final String fetchChartData="SELECT "
+                + "("+USERS_TABLE_NAME+"."+USERS_COLUMN_ANNUAL_INCOME+"/365)- SUM("+DAILY_EXPENSES_TABLE_NAME+"."+DAILY_EXPENSES_COLUMN_AMOUNT+") , "
+                + DAILY_EXPENSES_TABLE_NAME+"."+DAILY_EXPENSES_COLUMN_CREATED_DATE
+                + " FROM "+ DAILY_EXPENSES_TABLE_NAME
+                + " , " + SAVED_EXPENSES_TABLE_NAME
+                + " WHERE " + SAVED_EXPENSES_TABLE_NAME+ "." +SAVED_EXPENSES_COLUMN_USER+ " = '" + username +"'"
+                + " AND " + SAVED_EXPENSES_TABLE_NAME +"."+SAVED_EXPENSES_COLUMN_EXPENSE_ID
+                + " = " +DAILY_EXPENSES_TABLE_NAME+"."+DAILY_EXPENSES_COLUMN_SAVED_EXPENSE_ID
+                + " GROUP BY " + DAILY_EXPENSES_TABLE_NAME+"."+DAILY_EXPENSES_COLUMN_CREATED_DATE
+                + " HAVING" + " SUBSTR("+DAILY_EXPENSES_TABLE_NAME +"."+DAILY_EXPENSES_COLUMN_CREATED_DATE+",7)||"
+                + " SUBSTR("+DAILY_EXPENSES_TABLE_NAME +"."+DAILY_EXPENSES_COLUMN_CREATED_DATE+",4,2)||"
+                + " SUBSTR("+DAILY_EXPENSES_TABLE_NAME +"."+DAILY_EXPENSES_COLUMN_CREATED_DATE+",1,2) "
+                + " BETWEEN "
+                + "'"+fromDateFormatted+ "'"
+                + " AND "
+                + "'"+toDateFormatted+ "'";
+        Cursor cursor=sqLiteDatabase.rawQuery(fetchChartData,null);
+        if (cursor.moveToFirst()){
+            do{
+                chartDataUnit=new ChartDataUnit();
+                chartDataUnit.setDate(cursor.getString(cursor.getColumnIndex(DAILY_EXPENSES_COLUMN_CREATED_DATE)));
+                chartDataUnit.setExpenseAmount(cursor.getInt(0));
+                chartDataUnits.add(chartDataUnit);
+            }while(cursor.moveToNext());
+
+        }
+        cursor.close();
+        return chartDataUnits;
+    }
+
+    public List<ChartDataUnit> fetchDailyExpenseReport(String fromDate,String toDate,String username) throws ParseException {
+        List<ChartDataUnit> chartDataUnits=new ArrayList<>();
+        String fromDateFormatted=dateComparisionFormat.format(dateFormat.parse(fromDate));
+        String toDateFormatted=dateComparisionFormat.format(dateFormat.parse(toDate));
+        SQLiteDatabase sqLiteDatabase=this.getReadableDatabase();
+        ChartDataUnit chartDataUnit;
+
+        final String fetchChartData="SELECT "
+                + "SUM("+DAILY_EXPENSES_TABLE_NAME+"."+DAILY_EXPENSES_COLUMN_AMOUNT+") , "
+                + DAILY_EXPENSES_TABLE_NAME+"."+DAILY_EXPENSES_COLUMN_CREATED_DATE
+                + " FROM "+ DAILY_EXPENSES_TABLE_NAME
+                + " , " + SAVED_EXPENSES_TABLE_NAME
+                + " WHERE " + SAVED_EXPENSES_TABLE_NAME+ "." +SAVED_EXPENSES_COLUMN_USER+ " = '" + username +"'"
+                + " AND " + SAVED_EXPENSES_TABLE_NAME +"."+SAVED_EXPENSES_COLUMN_EXPENSE_ID
+                + " = " +DAILY_EXPENSES_TABLE_NAME+"."+DAILY_EXPENSES_COLUMN_SAVED_EXPENSE_ID
+                + " GROUP BY " + DAILY_EXPENSES_TABLE_NAME+"."+DAILY_EXPENSES_COLUMN_CREATED_DATE
+                + " HAVING" + " SUBSTR("+DAILY_EXPENSES_TABLE_NAME +"."+DAILY_EXPENSES_COLUMN_CREATED_DATE+",7)||"
+                + " SUBSTR("+DAILY_EXPENSES_TABLE_NAME +"."+DAILY_EXPENSES_COLUMN_CREATED_DATE+",4,2)||"
+                + " SUBSTR("+DAILY_EXPENSES_TABLE_NAME +"."+DAILY_EXPENSES_COLUMN_CREATED_DATE+",1,2) "
+                + " BETWEEN "
+                + "'"+fromDateFormatted+ "'"
+                + " AND "
+                + "'"+toDateFormatted+ "'";
+        Cursor cursor=sqLiteDatabase.rawQuery(fetchChartData,null);
+        if (cursor.moveToFirst()){
+            do{
+                chartDataUnit=new ChartDataUnit();
+                chartDataUnit.setDate(cursor.getString(cursor.getColumnIndex(DAILY_EXPENSES_COLUMN_CREATED_DATE)));
+                chartDataUnit.setExpenseAmount(cursor.getInt(0));
+                chartDataUnits.add(chartDataUnit);
+            }while(cursor.moveToNext());
+
+        }
+        cursor.close();
+        return chartDataUnits;
+    }
+
 }

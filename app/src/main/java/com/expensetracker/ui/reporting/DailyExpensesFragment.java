@@ -1,10 +1,13 @@
 package com.expensetracker.ui.reporting;
 
 import android.app.DatePickerDialog;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,9 +20,12 @@ import com.anychart.AnyChartView;
 import com.anychart.chart.common.dataentry.DataEntry;
 import com.anychart.chart.common.dataentry.ValueDataEntry;
 import com.anychart.charts.Pie;
+import com.expensetracker.ChartDataUnit;
+import com.expensetracker.DBHelper;
 import com.expensetracker.R;
 import com.google.android.material.datepicker.MaterialDatePicker;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -43,6 +49,9 @@ public class DailyExpensesFragment extends Fragment {
     private AnyChartView anyChartView;
     Pie pie;
     DatePickerDialog picker;
+    DBHelper mDBHelper;
+    SharedPreferences sharedPreferences;
+    List<ChartDataUnit> chartDataUnits;
     public DailyExpensesFragment() {
         // Required empty public constructor
     }
@@ -82,9 +91,20 @@ public class DailyExpensesFragment extends Fragment {
         View root  = inflater.inflate(R.layout.fragment_daily_expenses, container, false);
         mSelectDate = root.findViewById(R.id.button_select_date);
         pie = AnyChart.pie();
+
+        mDBHelper = new DBHelper(getContext());
+        sharedPreferences=getActivity().getSharedPreferences("expensetracker", Context.MODE_PRIVATE);
+
+        try {
+            //TODO: Change inputs to dynamic in DD/MM/YYYY format
+            chartDataUnits=mDBHelper.fetchItemizedReport("26/06/2020","28/06/2020",sharedPreferences.getString("username",""));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
         List<DataEntry> data = new ArrayList<>();
-        data.add(new ValueDataEntry("test", 10000));
-        data.add(new ValueDataEntry("Welcome", 12000));
+        for(ChartDataUnit chartDataUnit:chartDataUnits) {
+            data.add(new ValueDataEntry(chartDataUnit.getExpenseName(), chartDataUnit.getExpenseAmount()));
+        }
         pie.data(data);
         anyChartView = (AnyChartView) root.findViewById(R.id.any_chart_view);
         anyChartView.setChart(pie);

@@ -5,6 +5,7 @@ package com.expensetracker.ui.settings;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,6 +26,7 @@ import com.expensetracker.User;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.lang.ref.WeakReference;
+import java.text.ParseException;
 import java.util.List;
 
 import static android.content.Context.MODE_PRIVATE;

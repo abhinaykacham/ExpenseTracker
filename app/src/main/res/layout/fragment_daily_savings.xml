@@ -5,10 +5,20 @@
     android:layout_height="match_parent"
     tools:context=".ui.reporting.DailySavingsFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <FrameLayout
+        android:layout_weight="2.5"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        tools:context=".ui.reporting.DailySavingsFragment">
+
+        <com.anychart.AnyChartView
+            android:id="@+id/daily_saving_chart"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            />
+
+    </FrameLayout>
+
+    <!-- TODO: Update add controls -->
 
 </FrameLayout>
