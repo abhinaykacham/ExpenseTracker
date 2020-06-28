@@ -476,6 +476,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 + DAILY_EXPENSES_TABLE_NAME+"."+DAILY_EXPENSES_COLUMN_CREATED_DATE
                 + " FROM "+ DAILY_EXPENSES_TABLE_NAME
                 + " , " + SAVED_EXPENSES_TABLE_NAME
+                + " " + USERS_TABLE_NAME
                 + " WHERE " + SAVED_EXPENSES_TABLE_NAME+ "." +SAVED_EXPENSES_COLUMN_USER+ " = '" + username +"'"
                 + " AND " + SAVED_EXPENSES_TABLE_NAME +"."+SAVED_EXPENSES_COLUMN_EXPENSE_ID
                 + " = " +DAILY_EXPENSES_TABLE_NAME+"."+DAILY_EXPENSES_COLUMN_SAVED_EXPENSE_ID
