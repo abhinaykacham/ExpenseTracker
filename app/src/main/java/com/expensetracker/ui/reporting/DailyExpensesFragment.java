@@ -5,8 +5,10 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
+import androidx.core.util.Pair;
 import androidx.fragment.app.Fragment;
 
+import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,15 +21,21 @@ import com.anychart.AnyChart;
 import com.anychart.AnyChartView;
 import com.anychart.chart.common.dataentry.DataEntry;
 import com.anychart.chart.common.dataentry.ValueDataEntry;
+import com.anychart.charts.Cartesian;
 import com.anychart.charts.Pie;
+import com.anychart.core.cartesian.series.Bar;
 import com.expensetracker.ChartDataUnit;
 import com.expensetracker.DBHelper;
 import com.expensetracker.R;
+import com.google.android.material.datepicker.CalendarConstraints;
 import com.google.android.material.datepicker.MaterialDatePicker;
+import com.google.android.material.datepicker.MaterialPickerOnPositiveButtonClickListener;
 
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -47,11 +55,11 @@ public class DailyExpensesFragment extends Fragment {
     private String mParam2;
     private Button mSelectDate;
     private AnyChartView anyChartView;
-    Pie pie;
-    DatePickerDialog picker;
     DBHelper mDBHelper;
     SharedPreferences sharedPreferences;
     List<ChartDataUnit> chartDataUnits;
+    MaterialDatePicker picker;
+    String fromDate,toDate;
     public DailyExpensesFragment() {
         // Required empty public constructor
     }
@@ -88,10 +96,9 @@ public class DailyExpensesFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
 
-        View root  = inflater.inflate(R.layout.fragment_daily_expenses, container, false);
+        final View root  = inflater.inflate(R.layout.fragment_daily_expenses, container, false);
         mSelectDate = root.findViewById(R.id.button_select_date);
-        pie = AnyChart.pie();
-
+        final Cartesian cartesian = AnyChart.bar();
         mDBHelper = new DBHelper(getContext());
         sharedPreferences=getActivity().getSharedPreferences("expensetracker", Context.MODE_PRIVATE);
 
@@ -105,31 +112,37 @@ public class DailyExpensesFragment extends Fragment {
         for(ChartDataUnit chartDataUnit:chartDataUnits) {
             data.add(new ValueDataEntry(chartDataUnit.getExpenseName(), chartDataUnit.getExpenseAmount()));
         }
-        pie.data(data);
+        Bar bar = cartesian.bar(data);
         anyChartView = (AnyChartView) root.findViewById(R.id.any_chart_view);
-        anyChartView.setChart(pie);
-
+        anyChartView.setChart(cartesian);
+        MaterialDatePicker.Builder builder = MaterialDatePicker.Builder.dateRangePicker();
+        picker = builder.build();
         mSelectDate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Toast.makeText(getContext(),"Hellp",Toast.LENGTH_LONG).show();
-                /*final Calendar cldr = Calendar.getInstance();
-                int day = cldr.get(Calendar.DAY_OF_MONTH);
-                int month = cldr.get(Calendar.MONTH);
-                int year = cldr.get(Calendar.YEAR);
-                // date picker dialog
-                picker = new DatePickerDialog(getActivity(),
-                        new DatePickerDialog.OnDateSetListener() {
-                            @Override
-                            public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                                Toast.makeText(getContext(),dayOfMonth + "/" + (monthOfYear + 1) + "/" + year,Toast.LENGTH_LONG).show();
-                            }
-                        }, year, month, day);
-                picker.show();*/
-                /*MaterialDatePicker.Builder builder = MaterialDatePicker.Builder.dateRangePicker();
-                MaterialDatePicker picker = builder.build();
-                picker.show(getActivity().getSupportFragmentManager(), picker.toString()); */
+                picker.show(getActivity().getSupportFragmentManager(), picker.toString());
+            }
+        });
 
+        picker.addOnPositiveButtonClickListener(new MaterialPickerOnPositiveButtonClickListener() {
+            @Override
+            public void onPositiveButtonClick(Object selection) {
+
+                Pair<Long, Long> t = (Pair<Long, Long>) picker.getSelection();
+                fromDate= new SimpleDateFormat("dd/MM/yyyy").format(new Date(t.first));
+                toDate= new SimpleDateFormat("dd/MM/yyyy").format(new Date(t.second));
+                Toast.makeText(getContext(),fromDate+" "+toDate,Toast.LENGTH_LONG).show();
+              /*  anyChartView.clear();
+                Pie pie = AnyChart.pie();
+
+                List<DataEntry> data = new ArrayList<>();
+                data.add(new ValueDataEntry("John", 10000));
+                data.add(new ValueDataEntry("Jake", 12000));
+                data.add(new ValueDataEntry("Peter", 18000));
+
+                anyChartView = (AnyChartView) root.findViewById(R.id.any_chart_view);
+                anyChartView.setChart(pie);*/
             }
         });
 

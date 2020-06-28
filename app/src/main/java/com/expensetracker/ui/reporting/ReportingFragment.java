@@ -2,6 +2,7 @@
 
 package com.expensetracker.ui.reporting;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,6 +32,8 @@ public class ReportingFragment extends Fragment {
         tabLayout.addTab(tabLayout.newTab().setText("Daily Savings"));
         tabLayout.addTab(tabLayout.newTab().setText("Item Expenses"));
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
+        tabLayout.setSelectedTabIndicatorColor(Color.parseColor("#ffffff"));
+        tabLayout.setTabTextColors(Color.parseColor("#ffffff"), Color.parseColor("#ffffff"));
         final ViewPager viewPager =(ViewPager)root.findViewById(R.id.view_pager);
         FragmentCollectionPagerAdapter tabsAdapter = new FragmentCollectionPagerAdapter(this.getActivity().getSupportFragmentManager(), tabLayout.getTabCount());
         viewPager.setAdapter(tabsAdapter);
