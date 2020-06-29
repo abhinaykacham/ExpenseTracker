@@ -1,14 +1,37 @@
 package com.expensetracker.ui.reporting;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
+import androidx.core.util.Pair;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.Toast;
 
+import com.anychart.AnyChart;
+import com.anychart.AnyChartView;
+import com.anychart.chart.common.dataentry.DataEntry;
+import com.anychart.chart.common.dataentry.ValueDataEntry;
+import com.anychart.charts.Cartesian;
+import com.anychart.core.cartesian.series.Bar;
+import com.expensetracker.ChartDataUnit;
+import com.expensetracker.DBHelper;
 import com.expensetracker.R;
+import com.google.android.material.datepicker.MaterialDatePicker;
+import com.google.android.material.datepicker.MaterialPickerOnPositiveButtonClickListener;
+
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -17,6 +40,14 @@ import com.expensetracker.R;
  */
 public class DailySavingsFragment extends Fragment {
 
+    private AnyChartView anyChartView;
+    DBHelper mDBHelper;
+    SharedPreferences sharedPreferences;
+    List<ChartDataUnit> chartDataUnits;
+    MaterialDatePicker picker;
+    String fromDate,toDate;
+    private Button mSelectDate;
+    DateFormat dateFormat=new SimpleDateFormat("dd/MM/yyyy");
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -61,6 +92,59 @@ public class DailySavingsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_daily_savings, container, false);
+        View root= inflater.inflate(R.layout.fragment_daily_savings, container, false);
+        final Cartesian cartesian = AnyChart.bar();
+        mDBHelper = new DBHelper(getContext());
+        sharedPreferences=getActivity().getSharedPreferences("expensetracker", Context.MODE_PRIVATE);
+        mSelectDate=root.findViewById(R.id.button_select_date);
+        try {
+            chartDataUnits=mDBHelper.fetchDailySavingsReport(
+                    dateFormat.format(new Date(0))
+                    ,dateFormat.format(Calendar.getInstance().getTime())
+                    ,sharedPreferences.getString("username",""));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        List<DataEntry> data = new ArrayList<>();
+        for(ChartDataUnit chartDataUnit:chartDataUnits) {
+            data.add(new ValueDataEntry(chartDataUnit.getDate(), chartDataUnit.getExpenseAmount()));
+        }
+        Bar bar = cartesian.bar(data);
+        anyChartView = (AnyChartView) root.findViewById(R.id.daily_saving_chart);
+        anyChartView.setChart(cartesian);
+        MaterialDatePicker.Builder builder = MaterialDatePicker.Builder.dateRangePicker();
+        picker = builder.build();
+        mSelectDate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                picker.show(getActivity().getSupportFragmentManager(), picker.toString());
+            }
+        });
+
+        picker.addOnPositiveButtonClickListener(new MaterialPickerOnPositiveButtonClickListener() {
+            @Override
+            public void onPositiveButtonClick(Object selection) {
+
+                Pair<Long, Long> t = (Pair<Long, Long>) picker.getSelection();
+                fromDate= dateFormat.format(new Date(t.first));
+                toDate= dateFormat.format(new Date(t.second));
+                try {
+                    chartDataUnits=mDBHelper.fetchDailySavingsReport(
+                            fromDate
+                            ,toDate
+                            ,sharedPreferences.getString("username",""));
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                List<DataEntry> data = new ArrayList<>();
+                for(ChartDataUnit chartDataUnit:chartDataUnits) {
+                    data.add(new ValueDataEntry(chartDataUnit.getDate(), chartDataUnit.getExpenseAmount()));
+                }
+                Bar bar = cartesian.bar(data);
+                anyChartView.setChart(cartesian);
+            }
+        });
+
+        return root;
     }
 }

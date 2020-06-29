@@ -1,6 +1,8 @@
 package com.expensetracker;
 
-public class Expense {
+import java.io.Serializable;
+
+public class Expense implements Serializable {
     public int expenseAmount;
     public String createdDate;
     private int savedExpenseID;

@@ -105,17 +105,27 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/saved_expense_list"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:fadeScrollbars="false"
         android:scrollbarSize="6dp"
         android:scrollbars="vertical"
         app:layoutManager="LinearLayoutManager"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/m_txt_list_of_expense_label"
         app:layout_constraintVertical_bias="0.0"
-        tools:layout_editor_absoluteX="0dp"
         tools:context="com.expensetracker.HomeScreenActivity"
         tools:listitem="@layout/make_model_list" />
+
+    <TextView
+        android:id="@+id/place_holder_text_saved_expenses"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="It is idle here add expenses by tapping + at bottom of screen"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/m_txt_list_of_expense_label" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/add_saved_expense"

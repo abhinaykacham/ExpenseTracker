@@ -2,6 +2,7 @@ package com.expensetracker.ui.home;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
@@ -38,6 +39,9 @@ public class AddDailyExpenseActivity extends AppCompatActivity {
     String date;
     boolean result;
     boolean update=false;
+    String activityType;
+    Expense expenseFromPrevious;
+    Intent source;
     String TAG=this.getClass().getName();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,7 +49,7 @@ public class AddDailyExpenseActivity extends AppCompatActivity {
         setContentView(R.layout.activity_add_daily_expense);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle(R.string.add_daily_expenses);
-
+        source=getIntent();
         dateFormat=new SimpleDateFormat("dd/MM/yyyy");
         date= dateFormat.format(Calendar.getInstance().getTime());
         mDBHelper = new DBHelper(this);
@@ -63,17 +67,20 @@ public class AddDailyExpenseActivity extends AppCompatActivity {
         mDailyExpenseSpinner.setSelection(0);
         String mExpenseName =  getIntent().getStringExtra("SAVED_EXPENSE");
         String mExpenseAmount = Integer.toString(getIntent().getIntExtra("SAVED_EXPENSE_AMOUNT",0));
-        if(mExpenseName!=null && mExpenseAmount!=null){
+        activityType=source.getStringExtra("ACTIVITY_TYPE");
+        expenseFromPrevious=(Expense)source.getSerializableExtra("EXPENSE");
+        if(!activityType.equals("INSERT_DAILY_SAVED")){
             //mDailyExpenseSpinner.setSelection(0);
             //mDailyExpenseSpinner.setEnabled(false);
             int counter=0;
             for(Expense expense:mDailyExpenseArrayList){
-                if(expense.getExpenseName().equals(mExpenseName)){
+                if(expense.getExpenseName().equals(expenseFromPrevious.getExpenseName())){
                     mDailyExpenseSpinner.setSelection(counter);
                     mDailyExpenseSpinner.setEnabled(false);
-                    mDailyExpenseAmount.setText(mExpenseAmount);
+                    mDailyExpenseAmount.setText(String.valueOf(expenseFromPrevious.getExpenseAmount()));
                     expense.setExpenseAmount(Integer.parseInt(mExpenseAmount));
-                    update =true;
+                    mBtnAddDailyExpense.setText("Update Expense");
+                    //                    update =true;
                 }
                 counter++;
             }
@@ -96,9 +103,9 @@ public class AddDailyExpenseActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 expenseType=(Expense)mDailyExpenseSpinner.getSelectedItem();
-                if(update){
-                    expenseType.setExpenseAmount(Integer.valueOf(String.valueOf(mDailyExpenseAmount.getText())));
-                    int status = mDBHelper.updateExpense(expenseType);
+                if(activityType.equals("UPDATE_DAILY_EXPENSE")){
+                    expenseFromPrevious.setExpenseAmount(Integer.valueOf(String.valueOf(mDailyExpenseAmount.getText())));
+                    int status = mDBHelper.updateExpense(expenseFromPrevious);
                     if (status>0) {
                         Log.d(TAG, "Daily expense updated!!");
                         onBackPressed();
@@ -110,7 +117,22 @@ public class AddDailyExpenseActivity extends AppCompatActivity {
                         ).show();
                         Log.d(TAG, "Expense Update failed");
                     }
-                } else {
+                }
+                else if(activityType.equals("UPDATE_SAVED_EXPENSE")){
+                    expenseFromPrevious.setExpenseAmount(Integer.valueOf(String.valueOf(mDailyExpenseAmount.getText())));
+                    int status = mDBHelper.updateSavedExpense(expenseFromPrevious);
+                    if (status>0) {
+                        Log.d(TAG, "Daily expense updated!!");
+                        onBackPressed();
+                    } else {
+                        Toast.makeText(
+                                getApplicationContext()
+                                , "Expense Update failed"
+                                , Toast.LENGTH_LONG
+                        ).show();
+                        Log.d(TAG, "Expense Update failed");
+                    }
+                } else{
                     dailyExpense = new Expense();
                     dailyExpense.setSavedExpenseID(expenseType.getSavedExpenseID());
                     dailyExpense.setExpenseAmount(Integer.valueOf(String.valueOf(mDailyExpenseAmount.getText())));

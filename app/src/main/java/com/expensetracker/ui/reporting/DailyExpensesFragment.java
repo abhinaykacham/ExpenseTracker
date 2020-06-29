@@ -104,13 +104,13 @@ public class DailyExpensesFragment extends Fragment {
 
         try {
             //TODO: Change inputs to dynamic in DD/MM/YYYY format
-            chartDataUnits=mDBHelper.fetchItemizedReport("26/06/2020","28/06/2020",sharedPreferences.getString("username",""));
+            chartDataUnits=mDBHelper.fetchDailyExpenseReport("26/06/2020","28/06/2020",sharedPreferences.getString("username",""));
         } catch (ParseException e) {
             e.printStackTrace();
         }
         List<DataEntry> data = new ArrayList<>();
         for(ChartDataUnit chartDataUnit:chartDataUnits) {
-            data.add(new ValueDataEntry(chartDataUnit.getExpenseName(), chartDataUnit.getExpenseAmount()));
+            data.add(new ValueDataEntry(chartDataUnit.getDate(), chartDataUnit.getExpenseAmount()));
         }
         Bar bar = cartesian.bar(data);
         anyChartView = (AnyChartView) root.findViewById(R.id.any_chart_view);
@@ -120,7 +120,6 @@ public class DailyExpensesFragment extends Fragment {
         mSelectDate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getContext(),"Hellp",Toast.LENGTH_LONG).show();
                 picker.show(getActivity().getSupportFragmentManager(), picker.toString());
             }
         });
@@ -132,17 +131,11 @@ public class DailyExpensesFragment extends Fragment {
                 Pair<Long, Long> t = (Pair<Long, Long>) picker.getSelection();
                 fromDate= new SimpleDateFormat("dd/MM/yyyy").format(new Date(t.first));
                 toDate= new SimpleDateFormat("dd/MM/yyyy").format(new Date(t.second));
-                Toast.makeText(getContext(),fromDate+" "+toDate,Toast.LENGTH_LONG).show();
-              /*  anyChartView.clear();
-                Pie pie = AnyChart.pie();
-
-                List<DataEntry> data = new ArrayList<>();
-                data.add(new ValueDataEntry("John", 10000));
-                data.add(new ValueDataEntry("Jake", 12000));
-                data.add(new ValueDataEntry("Peter", 18000));
-
-                anyChartView = (AnyChartView) root.findViewById(R.id.any_chart_view);
-                anyChartView.setChart(pie);*/
+                try {
+                    chartDataUnits=mDBHelper.fetchDailyExpenseReport(fromDate,toDate,sharedPreferences.getString("username",""));
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
             }
         });
 

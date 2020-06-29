@@ -37,7 +37,10 @@ public class HomeFragment extends Fragment{
 
         addDailyExpenseButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                startActivity(new Intent(getActivity(), AddDailyExpenseActivity.class));
+                Intent intent=new Intent(getActivity(), AddDailyExpenseActivity.class);
+                intent.putExtra("ACTIVITY_TYPE","INSERT_DAILY_SAVED");
+                startActivity(intent);
+
             }
         });
 

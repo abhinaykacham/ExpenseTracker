@@ -24,17 +24,23 @@ public class ListOfExpensesAdapter extends RecyclerView.Adapter<ListOfExpensesAd
     SharedPreferences sharedPreferences;
     String username;
     DBHelper dbHelper;
+    TextView placeHolder;
+    boolean isDailyExpenseList;
     HomeScreenActivity homeScreenActivity;
 
     public ListOfExpensesAdapter(HomeScreenActivity homeScreenActivity,boolean isDailyExpenseList) {
         this.homeScreenActivity = homeScreenActivity;
         dbHelper=new DBHelper(homeScreenActivity);
+        this.isDailyExpenseList=isDailyExpenseList;
         sharedPreferences=homeScreenActivity.getSharedPreferences("expensetracker", Context.MODE_PRIVATE);
         username=sharedPreferences.getString("username","");
-        if(isDailyExpenseList)
-            expensesList=dbHelper.fetchDailyExpense(username);
-        else
-            expensesList=dbHelper.fetchSavedExpense(username);
+        if(isDailyExpenseList) {
+            expensesList = dbHelper.fetchDailyExpense(username);
+        }else {
+            placeHolder=homeScreenActivity.findViewById(R.id.place_holder_text_saved_expenses);
+            placeHolder.setVisibility(View.GONE);
+            expensesList = dbHelper.fetchSavedExpense(username);
+        }
     }
 
     @NonNull
@@ -42,11 +48,13 @@ public class ListOfExpensesAdapter extends RecyclerView.Adapter<ListOfExpensesAd
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view= LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.make_model_list,parent,false);
+
         return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
+        if(expensesList!=null && expensesList.size()>0) {
         final Expense expense=expensesList.get(holder.getAdapterPosition());
         holder.expenseName.setText(expense.getExpenseName());
         holder.expenseAmount.setText(String.valueOf(expense.getExpenseAmount()));
@@ -56,11 +64,17 @@ public class ListOfExpensesAdapter extends RecyclerView.Adapter<ListOfExpensesAd
 
                 Context context = v.getContext();
                 Intent intent = new Intent(context, AddDailyExpenseActivity.class);
-                intent.putExtra("SAVED_EXPENSE",expense.getExpenseName() );
-                intent.putExtra("SAVED_EXPENSE_AMOUNT",expense.getExpenseAmount() );
+//                intent.putExtra("SAVED_EXPENSE",expense.getExpenseName() );
+//                intent.putExtra("SAVED_EXPENSE_AMOUNT",expense.getExpenseAmount());
+                if(expense.getDailyExpenseID()!=0)
+                    intent.putExtra("ACTIVITY_TYPE","UPDATE_DAILY_EXPENSE");
+                else
+                    intent.putExtra("ACTIVITY_TYPE","UPDATE_SAVED_EXPENSE");
+                intent.putExtra("EXPENSE",expense);
                 context.startActivity(intent);
             }
         });
+        }
     }
 
     @Override

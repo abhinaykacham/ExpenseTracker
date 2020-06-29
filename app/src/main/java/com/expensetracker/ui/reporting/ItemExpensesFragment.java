@@ -5,24 +5,33 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
+import androidx.core.util.Pair;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 import com.anychart.AnyChart;
 import com.anychart.AnyChartView;
 import com.anychart.chart.common.dataentry.DataEntry;
 import com.anychart.chart.common.dataentry.ValueDataEntry;
 import com.anychart.charts.Cartesian;
+import com.anychart.charts.Pie;
 import com.anychart.core.cartesian.series.Column;
 import com.expensetracker.ChartDataUnit;
 import com.expensetracker.DBHelper;
 import com.expensetracker.R;
+import com.google.android.material.datepicker.MaterialDatePicker;
+import com.google.android.material.datepicker.MaterialPickerOnPositiveButtonClickListener;
 
+import java.text.DateFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -31,6 +40,9 @@ import java.util.List;
  * create an instance of this fragment.
  */
 public class ItemExpensesFragment extends Fragment {
+
+    String fromDate,toDate;
+    private Button mSelectDate;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -43,12 +55,12 @@ public class ItemExpensesFragment extends Fragment {
 
 
     private AnyChartView anyChartView;
-    Column column;
-
-    DatePickerDialog picker;
+    DateFormat dateFormat=new SimpleDateFormat("dd/MM/yyyy");
+    MaterialDatePicker picker;
     DBHelper mDBHelper;
     SharedPreferences sharedPreferences;
     List<ChartDataUnit> chartDataUnits;
+    Pie pie;
     public ItemExpensesFragment() {
         // Required empty public constructor
     }
@@ -85,15 +97,16 @@ public class ItemExpensesFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View root  = inflater.inflate(R.layout.fragment_item_expenses, container, false);
-        Cartesian cartesian = AnyChart.column();
-
-
+        pie = AnyChart.pie();
+        mSelectDate = root.findViewById(R.id.button_select_date);
         mDBHelper = new DBHelper(getContext());
         sharedPreferences=getActivity().getSharedPreferences("expensetracker", Context.MODE_PRIVATE);
 
         try {
-            //TODO: Change inputs to dynamic in DD/MM/YYYY format
-            chartDataUnits=mDBHelper.fetchItemizedReport("26/06/2020","28/06/2020",sharedPreferences.getString("username",""));
+            chartDataUnits=mDBHelper.fetchItemizedReport(
+                    dateFormat.format(new Date(0))
+                    ,dateFormat.format(Calendar.getInstance().getTime())
+                    ,sharedPreferences.getString("username",""));
         } catch (ParseException e) {
             e.printStackTrace();
         }
@@ -101,9 +114,43 @@ public class ItemExpensesFragment extends Fragment {
         for(ChartDataUnit chartDataUnit:chartDataUnits) {
             data.add(new ValueDataEntry(chartDataUnit.getExpenseName(), chartDataUnit.getExpenseAmount()));
         }
-        column=cartesian.column(data);
-        anyChartView=root.findViewById(R.id.itemized_chart);
-        anyChartView.setChart(cartesian);
+        pie.data(data);
+        anyChartView = (AnyChartView) root.findViewById(R.id.itemized_chart);
+        anyChartView.setChart(pie);
+        MaterialDatePicker.Builder builder = MaterialDatePicker.Builder.dateRangePicker();
+        picker = builder.build();
+        mSelectDate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                picker.show(getActivity().getSupportFragmentManager(), picker.toString());
+            }
+        });
+
+        picker.addOnPositiveButtonClickListener(new MaterialPickerOnPositiveButtonClickListener() {
+            @Override
+            public void onPositiveButtonClick(Object selection) {
+
+                Pair<Long, Long> t = (Pair<Long, Long>) picker.getSelection();
+                fromDate= dateFormat.format(new Date(t.first));
+                toDate= dateFormat.format(new Date(t.second));
+                try {
+                    chartDataUnits=mDBHelper.fetchItemizedReport(
+                            fromDate
+                            ,toDate
+                            ,sharedPreferences.getString("username",""));
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                List<DataEntry> data = new ArrayList<>();
+                for(ChartDataUnit chartDataUnit:chartDataUnits) {
+                    data.add(new ValueDataEntry(chartDataUnit.getExpenseName(), chartDataUnit.getExpenseAmount()));
+                }
+
+                Pie updatedPie=AnyChart.pie();
+                updatedPie.data(data);
+                anyChartView.setChart(updatedPie);
+            }
+        });
         return root;
     }
 }
