@@ -11,7 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public class SplashScreenActivity extends AppCompatActivity {
     private DBHelper mydb ;
-    private static int SPLASH_SCREEN_TIME_OUT = 1000;
+    private static int SPLASH_SCREEN_TIME_OUT = 800;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
