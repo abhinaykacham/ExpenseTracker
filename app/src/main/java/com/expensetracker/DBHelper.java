@@ -10,6 +10,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteDatabase;
 
@@ -257,8 +258,7 @@ public class DBHelper extends SQLiteOpenHelper {
     public boolean deleteDailyExpense(int dailyExpenseId){
         SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
         sqLiteDatabase.setForeignKeyConstraintsEnabled(true);
-
-        return sqLiteDatabase.delete(DAILY_EXPENSES_TABLE_NAME,DAILY_EXPENSES_COLUMN_EXPENSE_ID+" = "+dailyExpenseId,null)>0;
+        return sqLiteDatabase.delete(DAILY_EXPENSES_TABLE_NAME,DAILY_EXPENSES_COLUMN_EXPENSE_ID+" = ?",new String[]{Integer.toString(dailyExpenseId)})>0;
     }
 
     /**
@@ -267,9 +267,17 @@ public class DBHelper extends SQLiteOpenHelper {
      * @return true if expense got deleted, false if expense could not be deleted
      */
     public boolean deleteSavedExpense(int savedExpenseId){
-        SQLiteDatabase sqLiteDatabase=this.getWritableDatabase();
-        sqLiteDatabase.setForeignKeyConstraintsEnabled(true);
-        return sqLiteDatabase.delete(SAVED_EXPENSES_TABLE_NAME,SAVED_EXPENSES_COLUMN_EXPENSE_ID+savedExpenseId,null)>0;
+        Boolean result = false;
+        try
+        {
+            SQLiteDatabase sqLiteDatabase=this.getWritableDatabase();
+            sqLiteDatabase.setForeignKeyConstraintsEnabled(true);
+            result = sqLiteDatabase.delete(SAVED_EXPENSES_TABLE_NAME,SAVED_EXPENSES_COLUMN_EXPENSE_ID+" = ?",new String[]{Integer.toString(savedExpenseId)})>0;
+        }
+        catch (SQLException ex){
+            result=false;
+        }
+        return result;
     }
 
     /**

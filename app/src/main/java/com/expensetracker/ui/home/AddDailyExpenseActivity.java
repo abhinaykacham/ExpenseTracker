@@ -2,10 +2,13 @@ package com.expensetracker.ui.home;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -34,46 +37,47 @@ public class AddDailyExpenseActivity extends AppCompatActivity {
     String username;
     ArrayAdapter<Expense> mDailyExpenseAdapter;
     List<Expense> mDailyExpenseArrayList = new ArrayList<>();
-    Expense dailyExpense,expenseType;
+    Expense dailyExpense, expenseType;
     DateFormat dateFormat;
     String date;
     boolean result;
-    boolean update=false;
+    boolean update = false;
     String activityType;
     Expense expenseFromPrevious;
     Intent source;
-    String TAG=this.getClass().getName();
+    String TAG = this.getClass().getName();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_daily_expense);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle(R.string.add_daily_expenses);
-        source=getIntent();
-        dateFormat=new SimpleDateFormat("dd/MM/yyyy");
-        date= dateFormat.format(Calendar.getInstance().getTime());
+        source = getIntent();
+        dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        date = dateFormat.format(Calendar.getInstance().getTime());
         mDBHelper = new DBHelper(this);
         prefs = getSharedPreferences("expensetracker", MODE_PRIVATE);
         username = prefs.getString("username", "");
-        mDailyExpenseArrayList=mDBHelper.fetchSavedExpense(username);
+        mDailyExpenseArrayList = mDBHelper.fetchSavedExpense(username);
         mBtnAddDailyExpense = findViewById(R.id.button_adddailyexpense);
         mDailyExpenseAmount = findViewById(R.id.text_dailyexpenseamount);
         mDailyExpenseSpinner = findViewById(R.id.spinner_dailyexpense);
 
-        mDailyExpenseAdapter = new ArrayAdapter<>(this,android.R.layout.simple_spinner_item,mDailyExpenseArrayList);
+        mDailyExpenseAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, mDailyExpenseArrayList);
         mDailyExpenseAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mDailyExpenseSpinner.setAdapter(mDailyExpenseAdapter);
         mDailyExpenseSpinner.setPrompt("Select Expense Type");
         mDailyExpenseSpinner.setSelection(0);
-        String mExpenseName =  getIntent().getStringExtra("SAVED_EXPENSE");
-        String mExpenseAmount = Integer.toString(getIntent().getIntExtra("SAVED_EXPENSE_AMOUNT",0));
-        activityType=source.getStringExtra("ACTIVITY_TYPE");
-        expenseFromPrevious=(Expense)source.getSerializableExtra("EXPENSE");
+        String mExpenseName = getIntent().getStringExtra("SAVED_EXPENSE");
+        String mExpenseAmount = Integer.toString(getIntent().getIntExtra("SAVED_EXPENSE_AMOUNT", 0));
+        activityType = source.getStringExtra("ACTIVITY_TYPE");
+        expenseFromPrevious = (Expense) source.getSerializableExtra("EXPENSE");
 
         mDailyExpenseSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                Expense selectedExpense=(Expense) parent.getSelectedItem();
+                Expense selectedExpense = (Expense) parent.getSelectedItem();
                 mDailyExpenseAmount.setText(Integer.toString(selectedExpense.getExpenseAmount()));
             }
 
@@ -83,12 +87,12 @@ public class AddDailyExpenseActivity extends AppCompatActivity {
             }
         });
 
-        if(!activityType.equals("INSERT_DAILY_SAVED")){
+        if (!activityType.equals("INSERT_DAILY_SAVED")) {
             //mDailyExpenseSpinner.setSelection(0);
             //mDailyExpenseSpinner.setEnabled(false);
-            int counter=0;
-            for(Expense expense:mDailyExpenseArrayList){
-                if(expense.getExpenseName().equals(expenseFromPrevious.getExpenseName())){
+            int counter = 0;
+            for (Expense expense : mDailyExpenseArrayList) {
+                if (expense.getExpenseName().equals(expenseFromPrevious.getExpenseName())) {
                     mDailyExpenseSpinner.setSelection(counter);
                     mDailyExpenseSpinner.setEnabled(false);
                     mDailyExpenseAmount.setText(String.valueOf(expenseFromPrevious.getExpenseAmount()));
@@ -102,11 +106,11 @@ public class AddDailyExpenseActivity extends AppCompatActivity {
         mBtnAddDailyExpense.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                expenseType=(Expense)mDailyExpenseSpinner.getSelectedItem();
-                if(activityType.equals("UPDATE_DAILY_EXPENSE")){
+                expenseType = (Expense) mDailyExpenseSpinner.getSelectedItem();
+                if (activityType.equals("UPDATE_DAILY_EXPENSE")) {
                     expenseFromPrevious.setExpenseAmount(Integer.valueOf(String.valueOf(mDailyExpenseAmount.getText())));
                     int status = mDBHelper.updateExpense(expenseFromPrevious);
-                    if (status>0) {
+                    if (status > 0) {
                         Log.d(TAG, "Daily expense updated!!");
                         onBackPressed();
                     } else {
@@ -117,11 +121,10 @@ public class AddDailyExpenseActivity extends AppCompatActivity {
                         ).show();
                         Log.d(TAG, "Expense Update failed");
                     }
-                }
-                else if(activityType.equals("UPDATE_SAVED_EXPENSE")){
+                } else if (activityType.equals("UPDATE_SAVED_EXPENSE")) {
                     expenseFromPrevious.setExpenseAmount(Integer.valueOf(String.valueOf(mDailyExpenseAmount.getText())));
                     int status = mDBHelper.updateSavedExpense(expenseFromPrevious);
-                    if (status>0) {
+                    if (status > 0) {
                         Log.d(TAG, "Daily expense updated!!");
                         onBackPressed();
                     } else {
@@ -132,7 +135,7 @@ public class AddDailyExpenseActivity extends AppCompatActivity {
                         ).show();
                         Log.d(TAG, "Expense Update failed");
                     }
-                } else{
+                } else {
                     dailyExpense = new Expense();
                     dailyExpense.setSavedExpenseID(expenseType.getSavedExpenseID());
                     dailyExpense.setExpenseAmount(Integer.valueOf(String.valueOf(mDailyExpenseAmount.getText())));
@@ -159,5 +162,52 @@ public class AddDailyExpenseActivity extends AppCompatActivity {
     public boolean onSupportNavigateUp() {
         onBackPressed();
         return true;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate activity menu items.
+        if (activityType.equals("UPDATE_SAVED_EXPENSE") || activityType.equals("UPDATE_DAILY_EXPENSE")) {
+            getMenuInflater().inflate(R.menu.fragment_menu_items, menu);
+        }
+        return super.onCreateOptionsMenu(menu);
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int itemId = item.getItemId();
+
+        boolean showMessage = false;
+
+        String message = "";
+
+        if (itemId == R.id.fragment_menu_search) {
+            if (activityType.equals("UPDATE_SAVED_EXPENSE")) {
+                expenseType = (Expense) mDailyExpenseSpinner.getSelectedItem();
+                if (mDBHelper.deleteSavedExpense(expenseType.getSavedExpenseID())) {
+                    onBackPressed();
+                } else {
+                    message = "Make sure you don't have any daily items with this saved expense type";
+                    showMessage=true;
+                }
+            } else if (activityType.equals("UPDATE_DAILY_EXPENSE")) {
+                expenseType = (Expense) mDailyExpenseSpinner.getSelectedItem();
+                if (mDBHelper.deleteDailyExpense(expenseType.getDailyExpenseID())) {
+                    onBackPressed();
+                } else {
+                    message = "Unable to delete the daily expense item";
+                    showMessage=true;
+                }
+            }
+
+        }
+
+        if(showMessage) {
+            AlertDialog alertDialog = new AlertDialog.Builder(AddDailyExpenseActivity.this).create();
+            alertDialog.setMessage(message);
+            alertDialog.show();
+        }
+        return super.onOptionsItemSelected(item);
     }
 }
