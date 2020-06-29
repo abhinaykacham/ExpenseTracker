@@ -69,22 +69,7 @@ public class AddDailyExpenseActivity extends AppCompatActivity {
         String mExpenseAmount = Integer.toString(getIntent().getIntExtra("SAVED_EXPENSE_AMOUNT",0));
         activityType=source.getStringExtra("ACTIVITY_TYPE");
         expenseFromPrevious=(Expense)source.getSerializableExtra("EXPENSE");
-        if(!activityType.equals("INSERT_DAILY_SAVED")){
-            //mDailyExpenseSpinner.setSelection(0);
-            //mDailyExpenseSpinner.setEnabled(false);
-            int counter=0;
-            for(Expense expense:mDailyExpenseArrayList){
-                if(expense.getExpenseName().equals(expenseFromPrevious.getExpenseName())){
-                    mDailyExpenseSpinner.setSelection(counter);
-                    mDailyExpenseSpinner.setEnabled(false);
-                    mDailyExpenseAmount.setText(String.valueOf(expenseFromPrevious.getExpenseAmount()));
-                    expense.setExpenseAmount(Integer.parseInt(mExpenseAmount));
-                    mBtnAddDailyExpense.setText("Update Expense");
-                    //                    update =true;
-                }
-                counter++;
-            }
-        }
+
         mDailyExpenseSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -98,6 +83,21 @@ public class AddDailyExpenseActivity extends AppCompatActivity {
             }
         });
 
+        if(!activityType.equals("INSERT_DAILY_SAVED")){
+            //mDailyExpenseSpinner.setSelection(0);
+            //mDailyExpenseSpinner.setEnabled(false);
+            int counter=0;
+            for(Expense expense:mDailyExpenseArrayList){
+                if(expense.getExpenseName().equals(expenseFromPrevious.getExpenseName())){
+                    mDailyExpenseSpinner.setSelection(counter);
+                    mDailyExpenseSpinner.setEnabled(false);
+                    mDailyExpenseAmount.setText(String.valueOf(expenseFromPrevious.getExpenseAmount()));
+                    mBtnAddDailyExpense.setText("Update Expense");
+                    //                    update =true;
+                }
+                counter++;
+            }
+        }
 
         mBtnAddDailyExpense.setOnClickListener(new View.OnClickListener() {
             @Override
