@@ -1,6 +1,5 @@
 package com.expensetracker.ui.reporting;
 
-import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -8,29 +7,24 @@ import android.os.Bundle;
 import androidx.core.util.Pair;
 import androidx.fragment.app.Fragment;
 
-import android.text.format.DateFormat;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.DatePicker;
-import android.widget.Toast;
 
 import com.anychart.AnyChart;
 import com.anychart.AnyChartView;
 import com.anychart.chart.common.dataentry.DataEntry;
 import com.anychart.chart.common.dataentry.ValueDataEntry;
 import com.anychart.charts.Cartesian;
-import com.anychart.charts.Pie;
 import com.anychart.core.cartesian.series.Bar;
 import com.expensetracker.ChartDataUnit;
 import com.expensetracker.DBHelper;
 import com.expensetracker.R;
-import com.google.android.material.datepicker.CalendarConstraints;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.datepicker.MaterialPickerOnPositiveButtonClickListener;
 
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -45,12 +39,10 @@ import java.util.List;
  */
 public class DailyExpensesFragment extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
-    // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
     private Button mSelectDate;
@@ -60,6 +52,9 @@ public class DailyExpensesFragment extends Fragment {
     List<ChartDataUnit> chartDataUnits;
     MaterialDatePicker picker;
     String fromDate,toDate;
+    Bar bar;
+    DateFormat dateFormat=new SimpleDateFormat("dd/MM/yyyy");
+    List<DataEntry> customData;
     public DailyExpensesFragment() {
         // Required empty public constructor
     }
@@ -72,7 +67,6 @@ public class DailyExpensesFragment extends Fragment {
      * @param param2 Parameter 2.
      * @return A new instance of fragment DailyExpensesFragment.
      */
-    // TODO: Rename and change types and number of parameters
     public static DailyExpensesFragment newInstance(String param1, String param2) {
         DailyExpensesFragment fragment = new DailyExpensesFragment();
         Bundle args = new Bundle();
@@ -101,19 +95,20 @@ public class DailyExpensesFragment extends Fragment {
         final Cartesian cartesian = AnyChart.bar();
         mDBHelper = new DBHelper(getContext());
         sharedPreferences=getActivity().getSharedPreferences("expensetracker", Context.MODE_PRIVATE);
-
+        anyChartView = (AnyChartView) root.findViewById(R.id.any_chart_view);
         try {
-            //TODO: Change inputs to dynamic in DD/MM/YYYY format
-            chartDataUnits=mDBHelper.fetchDailyExpenseReport("26/06/2020","28/06/2020",sharedPreferences.getString("username",""));
+            chartDataUnits=mDBHelper.fetchDailyExpenseReport(
+                    dateFormat.format(new Date(0))
+                    ,dateFormat.format(Calendar.getInstance().getTime())
+                    ,sharedPreferences.getString("username",""));
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        List<DataEntry> data = new ArrayList<>();
+        final List<DataEntry> data = new ArrayList<>();
         for(ChartDataUnit chartDataUnit:chartDataUnits) {
             data.add(new ValueDataEntry(chartDataUnit.getDate(), chartDataUnit.getExpenseAmount()));
         }
-        Bar bar = cartesian.bar(data);
-        anyChartView = (AnyChartView) root.findViewById(R.id.any_chart_view);
+        bar = cartesian.bar(data);
         anyChartView.setChart(cartesian);
         MaterialDatePicker.Builder builder = MaterialDatePicker.Builder.dateRangePicker();
         picker = builder.build();
@@ -127,18 +122,22 @@ public class DailyExpensesFragment extends Fragment {
         picker.addOnPositiveButtonClickListener(new MaterialPickerOnPositiveButtonClickListener() {
             @Override
             public void onPositiveButtonClick(Object selection) {
-
+                customData = new ArrayList<>();
                 Pair<Long, Long> t = (Pair<Long, Long>) picker.getSelection();
-                fromDate= new SimpleDateFormat("dd/MM/yyyy").format(new Date(t.first));
-                toDate= new SimpleDateFormat("dd/MM/yyyy").format(new Date(t.second));
+                fromDate= dateFormat.format(new Date(t.first));
+                toDate= dateFormat.format(new Date(t.second));
                 try {
                     chartDataUnits=mDBHelper.fetchDailyExpenseReport(fromDate,toDate,sharedPreferences.getString("username",""));
+                    for(ChartDataUnit chartDataUnit:chartDataUnits) {
+                        customData.add(new ValueDataEntry(chartDataUnit.getDate(), chartDataUnit.getExpenseAmount()));
+                    }
+                    //TODO: Update this customData to chart
+                    bar.data(customData);
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
             }
         });
-
         return root;
     }
 
