@@ -442,7 +442,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 user.setAnnualIncome(cursor.getInt(cursor.getColumnIndex(USERS_COLUMN_ANNUAL_INCOME)));
                 user.setDesiredSaving(cursor.getInt(cursor.getColumnIndex(USERS_COLUMN_DESIRED_SAVING)));
                 user.setEmail(cursor.getString(cursor.getColumnIndex(USERS_COLUMN_EMAIL)));
-                user.setMaximumDailyExpense(cursor.getColumnIndex(USERS_COLUMN_MAXIMUM_DAILY_EXPENSE));
+                user.setMaximumDailyExpense(cursor.getInt(cursor.getColumnIndex(USERS_COLUMN_MAXIMUM_DAILY_EXPENSE)));
         }
         cursor.close();
         return user;
@@ -591,6 +591,12 @@ public class DBHelper extends SQLiteOpenHelper {
     }
 
     public int savingsProgress(String username){
+        /*
+            select 100*SUM(
+            select users.maximum_daily_expense - sum(daily_expenses.expense_amount)
+             WHERE
+            )/users.desired_saving
+         */
         int sum=0;
         SQLiteDatabase sqLiteDatabase=this.getReadableDatabase();
 
