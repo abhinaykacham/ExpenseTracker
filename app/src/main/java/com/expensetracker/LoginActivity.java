@@ -1,3 +1,5 @@
+/* Login Activity which authenticates user*/
+
 package com.expensetracker;
 
 import androidx.appcompat.app.AppCompatActivity;
