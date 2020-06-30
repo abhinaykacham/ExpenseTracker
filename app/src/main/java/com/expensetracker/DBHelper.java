@@ -176,7 +176,7 @@ public class DBHelper extends SQLiteOpenHelper {
         db=this.getWritableDatabase();
         if(validateUser(username,previousPassword)){
             final String updatePassword="UPDATE " + USERS_TABLE_NAME + " SET "
-                    + USERS_COLUMN_PWD + " = '" + newPassword + "' WHERE"
+                    + USERS_COLUMN_PWD + " = '" + newPassword + "' WHERE "
                     + USERS_COLUMN_USERNAME + " = '" + username + "'";
             Cursor c=db.rawQuery(updatePassword,null);
             if (c != null) {
@@ -185,6 +185,27 @@ public class DBHelper extends SQLiteOpenHelper {
                 }
             }
         }
+        return result;
+    }
+
+    /**
+     * Change @param previousPassword to @param newPassword of
+     * @param username
+     * @return true if email has been changed and vice versa
+     */
+    public boolean changeEmail(String username,String newEmail){
+        boolean result=false;
+        SQLiteDatabase db;
+        db=this.getWritableDatabase();
+            final String updateEmail="UPDATE " + USERS_TABLE_NAME + " SET "
+                    + USERS_COLUMN_EMAIL + " = '" + newEmail + "' WHERE "
+                    + USERS_COLUMN_USERNAME + " = '" + username + "'";
+            Cursor c=db.rawQuery(updateEmail,null);
+            if (c != null) {
+                if (c.getCount() > 0) {
+                    result = true;
+                }
+            }
         return result;
     }
 
