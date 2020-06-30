@@ -97,6 +97,6 @@ public class SettingsFragment extends Fragment {
         mEdtDesiredSaving.setText(String.valueOf(userDetails.getDesiredSaving()));
         mEdtAnnualIncome.setText(String.valueOf(userDetails.getAnnualIncome()));
         mEdtMaximumDailyExpense.setText(String.valueOf(userDetails.getMaximumDailyExpense()));
-        savedExpensesRecyclerView.setAdapter(new ListOfExpensesAdapter((HomeScreenActivity) getActivity(),dailyExpense));
+        savedExpensesRecyclerView.setAdapter(new ListOfExpensesAdapter((HomeScreenActivity) getActivity(),dailyExpense,""));
     }
 }
