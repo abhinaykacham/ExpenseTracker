@@ -178,7 +178,7 @@ public class AddDailyExpenseActivity extends AppCompatActivity {
 
         String message = "";
 
-        if (itemId == R.id.fragment_menu_search) {
+        if (itemId == R.id.fragment_menu_delete) {
             if (activityType.equals("UPDATE_SAVED_EXPENSE")) {
                 if (mDBHelper.deleteSavedExpense(expenseFromPrevious.getSavedExpenseID())) {
                     onBackPressed();
