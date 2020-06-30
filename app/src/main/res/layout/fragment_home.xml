@@ -13,11 +13,56 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:progress="25"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+    <TextView
+        android:id="@+id/totalDailyExpense"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/view"
+        app:layout_constraintBottom_toTopOf="@id/header"
+        android:textSize="18sp"/>
+    <LinearLayout
+    android:id="@+id/header"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:layout_constraintTop_toBottomOf="@+id/totalDailyExpense"
+    app:layout_constraintBottom_toTopOf="@id/daily_expenses_list"
+    android:orientation="horizontal"
+        android:layout_marginBottom="120dp">
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="start">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Expense Amount"
+                    android:layout_alignParentLeft="true"
+                     />
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    >
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="end"
+                    android:text="Expense Type"/>
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/choose_expense_from_date"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="end"
+                    android:src="@drawable/calendar_icon" />
+                </LinearLayout>
+            </RelativeLayout>
+</LinearLayout>
 
     <View
         android:id="@+id/view"
@@ -33,10 +78,12 @@
         android:fadeScrollbars="false"
         android:scrollbarSize="6dp"
         android:scrollbars="vertical"
+        android:layout_marginBottom="@dimen/activity_vertical_margin"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
         app:layoutManager="LinearLayoutManager"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/view"
+        app:layout_constraintTop_toBottomOf="@+id/totalDailyExpense"
         app:layout_constraintVertical_bias="0.054"
         tools:listitem="@layout/make_model_list" />
 

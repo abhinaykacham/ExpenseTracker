@@ -373,7 +373,8 @@ public class DBHelper extends SQLiteOpenHelper {
                 + " , " + SAVED_EXPENSES_TABLE_NAME
                 + " WHERE " + SAVED_EXPENSES_TABLE_NAME+ "." +SAVED_EXPENSES_COLUMN_USER+ " = '" + username +"'"
                 + " AND " + SAVED_EXPENSES_TABLE_NAME +"."+SAVED_EXPENSES_COLUMN_EXPENSE_ID
-                + " = " +DAILY_EXPENSES_TABLE_NAME+"."+DAILY_EXPENSES_COLUMN_SAVED_EXPENSE_ID;
+                + " = " + DAILY_EXPENSES_TABLE_NAME+"."+DAILY_EXPENSES_COLUMN_SAVED_EXPENSE_ID
+                + " AND " + DAILY_EXPENSES_TABLE_NAME+ "."+DAILY_EXPENSES_COLUMN_CREATED_DATE + " = '" + date+"'";
 
 
         Cursor cursor=sqLiteDatabase.rawQuery(selectExpense,null);
@@ -549,4 +550,44 @@ public class DBHelper extends SQLiteOpenHelper {
         return chartDataUnits;
     }
 
+    public int sumOfExpensesToday(String username,String date){
+        int sum=0;
+        SQLiteDatabase sqLiteDatabase=this.getReadableDatabase();
+
+        final String calculateSum="SELECT "
+                + "SUM("+DAILY_EXPENSES_TABLE_NAME+"."+DAILY_EXPENSES_COLUMN_AMOUNT+") "
+                + " FROM "+ DAILY_EXPENSES_TABLE_NAME
+                + " , " + SAVED_EXPENSES_TABLE_NAME
+                + " WHERE " + SAVED_EXPENSES_TABLE_NAME+ "." +SAVED_EXPENSES_COLUMN_USER+ " = '" + username +"'"
+                + " AND " + SAVED_EXPENSES_TABLE_NAME +"."+SAVED_EXPENSES_COLUMN_EXPENSE_ID
+                + " = " +DAILY_EXPENSES_TABLE_NAME+"."+DAILY_EXPENSES_COLUMN_SAVED_EXPENSE_ID
+                + " AND " + DAILY_EXPENSES_TABLE_NAME+ "."+DAILY_EXPENSES_COLUMN_CREATED_DATE + " = '" + date+"'";
+        Cursor cursor=sqLiteDatabase.rawQuery(calculateSum,null);
+        if(cursor.moveToFirst()){
+            sum=cursor.getInt(0);
+        }
+        return sum;
+    }
+
+    public int savingsProgress(String username){
+        int sum=0;
+        SQLiteDatabase sqLiteDatabase=this.getReadableDatabase();
+
+        final String calculateSum="SELECT "
+                + "100*SUM("+DAILY_EXPENSES_TABLE_NAME+"."+DAILY_EXPENSES_COLUMN_AMOUNT+")/"
+                + USERS_TABLE_NAME+"."+USERS_COLUMN_DESIRED_SAVING
+                + " FROM "+ DAILY_EXPENSES_TABLE_NAME
+                + " , " + SAVED_EXPENSES_TABLE_NAME
+                + " , " + USERS_TABLE_NAME
+                + " WHERE " + SAVED_EXPENSES_TABLE_NAME+ "." +SAVED_EXPENSES_COLUMN_USER+ " = '" + username +"'"
+                + " AND " + SAVED_EXPENSES_TABLE_NAME +"."+SAVED_EXPENSES_COLUMN_EXPENSE_ID
+                + " = " +DAILY_EXPENSES_TABLE_NAME+"."+DAILY_EXPENSES_COLUMN_SAVED_EXPENSE_ID
+                + " AND " + USERS_TABLE_NAME+"."+USERS_COLUMN_USERNAME
+                + " = " + SAVED_EXPENSES_TABLE_NAME+"."+SAVED_EXPENSES_COLUMN_USER;
+        Cursor cursor=sqLiteDatabase.rawQuery(calculateSum,null);
+        if(cursor.moveToFirst()){
+            sum=cursor.getInt(0);
+        }
+        return sum;
+    }
 }

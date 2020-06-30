@@ -16,6 +16,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.expensetracker.ui.home.AddDailyExpenseActivity;
 
 import java.io.Serializable;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 public class ListOfExpensesAdapter extends RecyclerView.Adapter<ListOfExpensesAdapter.ViewHolder>
@@ -27,20 +29,21 @@ public class ListOfExpensesAdapter extends RecyclerView.Adapter<ListOfExpensesAd
     TextView placeHolder;
     boolean isDailyExpenseList;
     HomeScreenActivity homeScreenActivity;
-
-    public ListOfExpensesAdapter(HomeScreenActivity homeScreenActivity,boolean isDailyExpenseList) {
+    String date;
+    public ListOfExpensesAdapter(HomeScreenActivity homeScreenActivity,boolean isDailyExpenseList,String date) {
         this.homeScreenActivity = homeScreenActivity;
         dbHelper=new DBHelper(homeScreenActivity);
         this.isDailyExpenseList=isDailyExpenseList;
         sharedPreferences=homeScreenActivity.getSharedPreferences("expensetracker", Context.MODE_PRIVATE);
         username=sharedPreferences.getString("username","");
         if(isDailyExpenseList) {
-            expensesList = dbHelper.fetchDailyExpense(username);
+            expensesList = dbHelper.fetchDailyExpense(username,date);
         }else {
             placeHolder=homeScreenActivity.findViewById(R.id.place_holder_text_saved_expenses);
             placeHolder.setVisibility(View.GONE);
             expensesList = dbHelper.fetchSavedExpense(username);
         }
+        this.date=date;
     }
 
     @NonNull
@@ -64,8 +67,6 @@ public class ListOfExpensesAdapter extends RecyclerView.Adapter<ListOfExpensesAd
 
                 Context context = v.getContext();
                 Intent intent = new Intent(context, AddDailyExpenseActivity.class);
-//                intent.putExtra("SAVED_EXPENSE",expense.getExpenseName() );
-//                intent.putExtra("SAVED_EXPENSE_AMOUNT",expense.getExpenseAmount());
                 if(expense.getDailyExpenseID()!=0)
                     intent.putExtra("ACTIVITY_TYPE","UPDATE_DAILY_EXPENSE");
                 else
