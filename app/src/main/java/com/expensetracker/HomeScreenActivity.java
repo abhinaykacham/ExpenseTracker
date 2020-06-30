@@ -48,7 +48,7 @@ public class HomeScreenActivity extends AppCompatActivity {
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         mAppBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.nav_home, R.id.nav_addexpenses,R.id.nav_reporting, R.id.nav_help, R.id.nav_about,R.id.nav_updatepassword)
+                R.id.nav_home, R.id.nav_addexpenses,R.id.nav_reporting, R.id.nav_help, R.id.nav_about,R.id.nav_updatepassword,R.id.nav_updateemail)
                 .setDrawerLayout(mDrawerLayoutDrawer)
                 .build();
         //Setting user name for Navigation Header

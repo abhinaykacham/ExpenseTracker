@@ -57,4 +57,7 @@
     <string name="update_password">Update Password</string>Learn more about Android app develo
     <string name="help">Please reach us at <a href="https://gmail.com">ExpenseTracker.com</a> for any queries</string>
     <string name="copy_right" translatable="false">Copyrights © %1$d</string>
+    <string name="enter_new_email">Enter New Email Address</string>
+    <string name="update_email">Update Email</string>
+    <string name="menu_changeemail">Change Email</string>
 </resources>
