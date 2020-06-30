@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Menu;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -30,17 +31,18 @@ public class HomeScreenActivity extends AppCompatActivity {
     FloatingActionButton mFloatingActionButton;
     DrawerLayout mDrawerLayoutDrawer;
     NavigationView mNavigationView;
+    View mHeaderView;
     NavController mNavController;
-
+    SharedPreferences preferences;
+    TextView mTextUser;
+    String username;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_screen);
         mToolbar = findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
-
-        //If Required use floating action button for some action
-
+        preferences = getSharedPreferences("expensetracker", Context.MODE_PRIVATE);
         mDrawerLayoutDrawer = findViewById(R.id.drawer_layout);
         mNavigationView = findViewById(R.id.nav_view);
         // Passing each menu ID as a set of Ids because each
@@ -49,6 +51,11 @@ public class HomeScreenActivity extends AppCompatActivity {
                 R.id.nav_home, R.id.nav_addexpenses,R.id.nav_reporting, R.id.nav_help, R.id.nav_about,R.id.nav_updatepassword)
                 .setDrawerLayout(mDrawerLayoutDrawer)
                 .build();
+        //Setting user name for Navigation Header
+        mHeaderView = mNavigationView.getHeaderView(0);
+        mTextUser = mHeaderView.findViewById(R.id.text_user);
+        username= preferences.getString("username", "");
+        mTextUser.setText(username);
         mNavController = Navigation.findNavController(this, R.id.nav_host_fragment);
         NavigationUI.setupActionBarWithNavController(this, mNavController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(mNavigationView, mNavController);
@@ -56,7 +63,6 @@ public class HomeScreenActivity extends AppCompatActivity {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 //Removing the user data when logged out of expense tracker
-                SharedPreferences preferences = getSharedPreferences("expensetracker", Context.MODE_PRIVATE);
                 SharedPreferences.Editor editor = preferences.edit();
                 editor.clear();
                 editor.apply();

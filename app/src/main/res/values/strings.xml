@@ -30,8 +30,8 @@
     <string name="logout">Logout</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="nav_header_title">Expense Tracker</string>
-    <string name="nav_header_subtitle">ExpenseTracker@gmail.com</string>
+    <string name="nav_header_title">Hello</string>
+    <string name="nav_header_subtitle">User</string>
     <string name="nav_header_desc">Expense Tracker</string>
     <string name="action_settings">Settings</string>
     <string name="add_expenses">Add Expenses</string>
