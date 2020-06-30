@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import com.anychart.APIlib;
 import com.anychart.AnyChart;
 import com.anychart.AnyChartView;
 import com.anychart.chart.common.dataentry.DataEntry;
@@ -145,10 +146,10 @@ public class ItemExpensesFragment extends Fragment {
                 for(ChartDataUnit chartDataUnit:chartDataUnits) {
                     data.add(new ValueDataEntry(chartDataUnit.getExpenseName(), chartDataUnit.getExpenseAmount()));
                 }
-
-                Pie updatedPie=AnyChart.pie();
-                updatedPie.data(data);
-                anyChartView.setChart(updatedPie);
+                APIlib.getInstance().setActiveAnyChartView(anyChartView);
+                //Pie updatedPie=AnyChart.pie();
+                pie.data(data);
+                //anyChartView.setChart(updatedPie);
             }
         });
         return root;
