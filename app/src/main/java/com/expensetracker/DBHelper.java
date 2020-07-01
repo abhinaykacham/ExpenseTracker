@@ -3,22 +3,21 @@
 package com.expensetracker;
 
 import java.text.ParseException;
+import java.time.LocalDate;
+import java.time.Period;
+import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Hashtable;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.DatabaseUtils;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteDatabase;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 public class DBHelper extends SQLiteOpenHelper {
@@ -296,11 +295,6 @@ public class DBHelper extends SQLiteOpenHelper {
      */
     public int updateExpense(Expense dailyExpenses){
         SQLiteDatabase sqLiteDatabase=this.getWritableDatabase();
-       /* ContentValues contentValues=new ContentValues();
-        contentValues.put(DAILY_EXPENSES_COLUMN_AMOUNT,dailyExpenses.getExpenseAmount());
-        return sqLiteDatabase.update(DAILY_EXPENSES_TABLE_NAME,contentValues,
-                DAILY_EXPENSES_COLUMN_EXPENSE_ID+" = ?",
-                new String[]{Integer.toString(dailyExpenses.getDailyExpenseID())});*/
         int result=1;
         final String updateDailyExpenses="UPDATE " + DAILY_EXPENSES_TABLE_NAME + " SET "
                 + DAILY_EXPENSES_COLUMN_AMOUNT + " = " + dailyExpenses.getExpenseAmount()
@@ -436,6 +430,14 @@ public class DBHelper extends SQLiteOpenHelper {
         return user;
     }
 
+    /**
+     * Fetches data of amount each item contribute to total expense between range
+     * @param fromDate
+     * @param toDate
+     * @param username
+     * @return
+     * @throws ParseException
+     */
     public List<ChartDataUnit> fetchItemizedReport(String fromDate, String toDate, String username) throws ParseException {
         /*
         select sum(daily_expenses.expense_amount),saved_expenses.expense_name
@@ -482,6 +484,14 @@ public class DBHelper extends SQLiteOpenHelper {
         return chartDataUnits;
     }
 
+    /**
+     * Fetches details of daily savings between selected range
+     * @param fromDate
+     * @param toDate
+     * @param username
+     * @return
+     * @throws ParseException
+     */
     public List<ChartDataUnit> fetchDailySavingsReport(String fromDate,String toDate,String username) throws ParseException {
         List<ChartDataUnit> chartDataUnits=new ArrayList<>();
         String fromDateFormatted=dateComparisionFormat.format(dateFormat.parse(fromDate));
@@ -522,6 +532,14 @@ public class DBHelper extends SQLiteOpenHelper {
         return chartDataUnits;
     }
 
+    /**
+     * Fetches data of daily expenses of user between selected date range
+     * @param fromDate
+     * @param toDate
+     * @param username
+     * @return
+     * @throws ParseException
+     */
     public List<ChartDataUnit> fetchDailyExpenseReport(String fromDate,String toDate,String username) throws ParseException {
         List<ChartDataUnit> chartDataUnits=new ArrayList<>();
         String fromDateFormatted=dateComparisionFormat.format(dateFormat.parse(fromDate));
@@ -559,17 +577,26 @@ public class DBHelper extends SQLiteOpenHelper {
         return chartDataUnits;
     }
 
-    public int sumOfExpensesToday(String username,String date){
+    /**
+     * This method returns total savings of selected input parameter date
+     * @param username
+     * @param date
+     * @return
+     */
+    public int totalSavingsofADay(String username, String date){
         int sum=0;
         SQLiteDatabase sqLiteDatabase=this.getReadableDatabase();
 
         final String calculateSum="SELECT "
-                + "SUM("+DAILY_EXPENSES_TABLE_NAME+"."+DAILY_EXPENSES_COLUMN_AMOUNT+") "
+                + "("+USERS_TABLE_NAME+"."+USERS_COLUMN_ANNUAL_INCOME+"/365)- SUM("+DAILY_EXPENSES_TABLE_NAME+"."+DAILY_EXPENSES_COLUMN_AMOUNT+")"
                 + " FROM "+ DAILY_EXPENSES_TABLE_NAME
                 + " , " + SAVED_EXPENSES_TABLE_NAME
+                + " , " + USERS_TABLE_NAME
                 + " WHERE " + SAVED_EXPENSES_TABLE_NAME+ "." +SAVED_EXPENSES_COLUMN_USER+ " = '" + username +"'"
                 + " AND " + SAVED_EXPENSES_TABLE_NAME +"."+SAVED_EXPENSES_COLUMN_EXPENSE_ID
-                + " = " +DAILY_EXPENSES_TABLE_NAME+"."+DAILY_EXPENSES_COLUMN_SAVED_EXPENSE_ID
+                + " = " + DAILY_EXPENSES_TABLE_NAME+"."+DAILY_EXPENSES_COLUMN_SAVED_EXPENSE_ID
+                + " AND " + SAVED_EXPENSES_TABLE_NAME + "." + SAVED_EXPENSES_COLUMN_USER
+                + " = " + USERS_TABLE_NAME+ "." + USERS_COLUMN_USERNAME
                 + " AND " + DAILY_EXPENSES_TABLE_NAME+ "."+DAILY_EXPENSES_COLUMN_CREATED_DATE + " = '" + date+"'";
         Cursor cursor=sqLiteDatabase.rawQuery(calculateSum,null);
         if(cursor.moveToFirst()){
@@ -578,31 +605,113 @@ public class DBHelper extends SQLiteOpenHelper {
         return sum;
     }
 
-    public int savingsProgress(String username){
-        /*
-            select 100*SUM(
-            select users.maximum_daily_expense - sum(daily_expenses.expense_amount)
-             WHERE
-            )/users.desired_saving
-         */
+    /**
+     * This method gives the percentage of savings till date
+     * @param username
+     * @return
+     * @throws ParseException
+     */
+    public int savingsProgress(String username) throws ParseException {
         int sum=0;
         SQLiteDatabase sqLiteDatabase=this.getReadableDatabase();
+        int count=noOfDaysSinceGoalStarted(username);
+        if(count==0){
+            return 0;
+        }
 
-        final String calculateSum="SELECT "
-                + "100*SUM("+DAILY_EXPENSES_TABLE_NAME+"."+DAILY_EXPENSES_COLUMN_AMOUNT+")/"
-                + USERS_TABLE_NAME+"."+USERS_COLUMN_DESIRED_SAVING
-                + " FROM "+ DAILY_EXPENSES_TABLE_NAME
-                + " , " + SAVED_EXPENSES_TABLE_NAME
-                + " , " + USERS_TABLE_NAME
-                + " WHERE " + SAVED_EXPENSES_TABLE_NAME+ "." +SAVED_EXPENSES_COLUMN_USER+ " = '" + username +"'"
-                + " AND " + SAVED_EXPENSES_TABLE_NAME +"."+SAVED_EXPENSES_COLUMN_EXPENSE_ID
-                + " = " +DAILY_EXPENSES_TABLE_NAME+"."+DAILY_EXPENSES_COLUMN_SAVED_EXPENSE_ID
-                + " AND " + USERS_TABLE_NAME+"."+USERS_COLUMN_USERNAME
-                + " = " + SAVED_EXPENSES_TABLE_NAME+"."+SAVED_EXPENSES_COLUMN_USER;
+        final String calculateSum=" SELECT 100*("
+                + totalSavingsTilldate(username)
+                +")/"
+                +USERS_TABLE_NAME+"."+USERS_COLUMN_DESIRED_SAVING
+                + " FROM " +USERS_TABLE_NAME
+                + " WHERE " + USERS_TABLE_NAME+ "." +USERS_COLUMN_USERNAME+ " = '" + username +"'";
         Cursor cursor=sqLiteDatabase.rawQuery(calculateSum,null);
         if(cursor.moveToFirst()){
             sum=cursor.getInt(0);
         }
         return sum;
+    }
+
+    /**
+     * This method gives the total number of days since goal started
+     * @param username
+     * @return
+     * @throws ParseException
+     */
+    public int noOfDaysSinceGoalStarted(String username) throws ParseException {
+        String startDate="";
+        int count=0;
+        SQLiteDatabase sqLiteDatabase=this.getReadableDatabase();
+
+        final String calculateSum="SELECT "
+                + DAILY_EXPENSES_TABLE_NAME+"."+DAILY_EXPENSES_COLUMN_CREATED_DATE
+                + " FROM "+ DAILY_EXPENSES_TABLE_NAME
+                + " , " + SAVED_EXPENSES_TABLE_NAME
+                + " WHERE " + SAVED_EXPENSES_TABLE_NAME+ "." +SAVED_EXPENSES_COLUMN_USER+ " = '" + username +"'"
+                + " AND " + SAVED_EXPENSES_TABLE_NAME +"."+SAVED_EXPENSES_COLUMN_EXPENSE_ID
+                + " = " +DAILY_EXPENSES_TABLE_NAME+"."+DAILY_EXPENSES_COLUMN_SAVED_EXPENSE_ID
+                + " ORDER BY " + DAILY_EXPENSES_COLUMN_EXPENSE_ID;
+
+        Cursor cursor=sqLiteDatabase.rawQuery(calculateSum,null);
+        if(cursor.moveToFirst()){
+            startDate=cursor.getString(0);
+            count= Period.between(dateFormat.parse(startDate).toInstant()
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDate(),LocalDate.now()).getDays();
+        }
+
+        return count+1;
+    }
+
+    /**
+     * This method returns sum of expenses of a user till date
+     * @param username
+     * @return
+     */
+    public int totalExpensesTilldate(String username){
+        SQLiteDatabase sqLiteDatabase=this.getReadableDatabase();
+        int totalExpensesSum=0;
+        final String calculateTotalExpensesSum="SELECT "
+                + " SUM("+DAILY_EXPENSES_TABLE_NAME+"."+DAILY_EXPENSES_COLUMN_AMOUNT+")"
+                + " FROM "+ DAILY_EXPENSES_TABLE_NAME
+                + " , " + SAVED_EXPENSES_TABLE_NAME
+                + " WHERE " + SAVED_EXPENSES_TABLE_NAME+ "." +SAVED_EXPENSES_COLUMN_USER+ " = '" + username +"'"
+                + " AND " + SAVED_EXPENSES_TABLE_NAME +"."+SAVED_EXPENSES_COLUMN_EXPENSE_ID
+                + " = " + DAILY_EXPENSES_TABLE_NAME+"."+DAILY_EXPENSES_COLUMN_SAVED_EXPENSE_ID;
+
+        Cursor cursor=sqLiteDatabase.rawQuery(calculateTotalExpensesSum,null);
+        if(cursor.moveToFirst()){
+            totalExpensesSum=cursor.getInt(0);
+        }
+        return totalExpensesSum;
+    }
+
+    /**
+     * This method gives sum of income of a user till date
+     * @param username
+     * @return
+     * @throws ParseException
+     */
+    public int totalIncomeTillDate(String username) throws ParseException {
+        SQLiteDatabase sqLiteDatabase=this.getReadableDatabase();
+        int totalTargetSum=0;
+        int count=noOfDaysSinceGoalStarted(username);
+        if(count==0){
+            return 0;
+        }
+        final String calculateTotalExpensesSum="SELECT "
+                + count+"*("+USERS_TABLE_NAME+"."+USERS_COLUMN_ANNUAL_INCOME+"/365)"
+                + " FROM "+ USERS_TABLE_NAME
+                + " WHERE " + USERS_TABLE_NAME+ "." +USERS_COLUMN_USERNAME+ " = '" + username +"'";
+
+        Cursor cursor=sqLiteDatabase.rawQuery(calculateTotalExpensesSum,null);
+        if(cursor.moveToFirst()){
+            totalTargetSum=cursor.getInt(0);
+        }
+        return totalTargetSum;
+    }
+
+    public int totalSavingsTilldate(String username) throws ParseException {
+        return totalIncomeTillDate(username)-totalExpensesTilldate(username);
     }
 }
