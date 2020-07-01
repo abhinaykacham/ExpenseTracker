@@ -5,7 +5,9 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context=".ui.reporting.DailySavingsFragment">
-
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="50dp"/>
     <FrameLayout
 
         android:layout_width="match_parent"
