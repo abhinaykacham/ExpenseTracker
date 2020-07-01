@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import com.anychart.APIlib;
 import com.anychart.AnyChart;
 import com.anychart.AnyChartView;
 import com.anychart.chart.common.dataentry.DataEntry;
@@ -131,7 +132,11 @@ public class DailyExpensesFragment extends Fragment {
                     for(ChartDataUnit chartDataUnit:chartDataUnits) {
                         customData.add(new ValueDataEntry(chartDataUnit.getDate(), chartDataUnit.getExpenseAmount()));
                     }
-                    //TODO: Update this customData to chart
+                    APIlib.getInstance().setActiveAnyChartView(anyChartView);
+                    if(customData.size()==0)
+                        anyChartView.setVisibility(View.GONE);
+                    else
+                        anyChartView.setVisibility(View.VISIBLE);
                     bar.data(customData);
                 } catch (ParseException e) {
                     e.printStackTrace();

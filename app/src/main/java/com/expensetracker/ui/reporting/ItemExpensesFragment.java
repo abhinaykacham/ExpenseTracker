@@ -147,9 +147,11 @@ public class ItemExpensesFragment extends Fragment {
                     data.add(new ValueDataEntry(chartDataUnit.getExpenseName(), chartDataUnit.getExpenseAmount()));
                 }
                 APIlib.getInstance().setActiveAnyChartView(anyChartView);
-                //Pie updatedPie=AnyChart.pie();
+                if(data.size()==0)
+                    anyChartView.setVisibility(View.GONE);
+                else
+                    anyChartView.setVisibility(View.VISIBLE);
                 pie.data(data);
-                //anyChartView.setChart(updatedPie);
             }
         });
         return root;

@@ -44,9 +44,7 @@ public class DailySavingsFragment extends Fragment {
     DBHelper mDBHelper;
     SharedPreferences sharedPreferences;
     List<ChartDataUnit> chartDataUnits;
-    MaterialDatePicker picker;
     String fromDate,toDate;
-    private Button mSelectDate;
     DateFormat dateFormat=new SimpleDateFormat("dd/MM/yyyy");
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -96,7 +94,6 @@ public class DailySavingsFragment extends Fragment {
         final Cartesian cartesian = AnyChart.bar();
         mDBHelper = new DBHelper(getContext());
         sharedPreferences=getActivity().getSharedPreferences("expensetracker", Context.MODE_PRIVATE);
-        mSelectDate=root.findViewById(R.id.button_select_date);
         try {
             chartDataUnits=mDBHelper.fetchDailySavingsReport(
                     dateFormat.format(new Date(0))
@@ -112,39 +109,6 @@ public class DailySavingsFragment extends Fragment {
         Bar bar = cartesian.bar(data);
         anyChartView = (AnyChartView) root.findViewById(R.id.daily_saving_chart);
         anyChartView.setChart(cartesian);
-        MaterialDatePicker.Builder builder = MaterialDatePicker.Builder.dateRangePicker();
-        picker = builder.build();
-        mSelectDate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                picker.show(getActivity().getSupportFragmentManager(), picker.toString());
-            }
-        });
-
-        picker.addOnPositiveButtonClickListener(new MaterialPickerOnPositiveButtonClickListener() {
-            @Override
-            public void onPositiveButtonClick(Object selection) {
-
-                Pair<Long, Long> t = (Pair<Long, Long>) picker.getSelection();
-                fromDate= dateFormat.format(new Date(t.first));
-                toDate= dateFormat.format(new Date(t.second));
-                try {
-                    chartDataUnits=mDBHelper.fetchDailySavingsReport(
-                            fromDate
-                            ,toDate
-                            ,sharedPreferences.getString("username",""));
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-                List<DataEntry> data = new ArrayList<>();
-                for(ChartDataUnit chartDataUnit:chartDataUnits) {
-                    data.add(new ValueDataEntry(chartDataUnit.getDate(), chartDataUnit.getExpenseAmount()));
-                }
-                Bar bar = cartesian.bar(data);
-                anyChartView.setChart(cartesian);
-            }
-        });
-
         return root;
     }
 }
