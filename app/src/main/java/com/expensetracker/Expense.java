@@ -2,6 +2,10 @@ package com.expensetracker;
 
 import java.io.Serializable;
 
+/**
+ * This method is a POJO class which is used to maintain data of
+ * saved expenses and daily expenses
+ */
 public class Expense implements Serializable {
     public int expenseAmount;
     public String createdDate;
