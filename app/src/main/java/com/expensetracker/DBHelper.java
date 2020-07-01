@@ -171,21 +171,16 @@ public class DBHelper extends SQLiteOpenHelper {
      * @return true if password has been changed and vice versa
      */
     public boolean changePassword(String username,String previousPassword, String newPassword){
-        boolean result=false;
+        int result=0;
         SQLiteDatabase db;
         db=this.getWritableDatabase();
-        if(validateUser(username,previousPassword)){
-            final String updatePassword="UPDATE " + USERS_TABLE_NAME + " SET "
-                    + USERS_COLUMN_PWD + " = '" + newPassword + "' WHERE "
-                    + USERS_COLUMN_USERNAME + " = '" + username + "'";
-            Cursor c=db.rawQuery(updatePassword,null);
-            if (c != null) {
-                if (c.getCount() > 0) {
-                    result = true;
-                }
-            }
-        }
-        return result;
+        ContentValues contentValues=new ContentValues();
+
+        contentValues.put(USERS_COLUMN_PWD,newPassword);
+
+        result=db.update(USERS_TABLE_NAME,contentValues,USERS_COLUMN_USERNAME+"='"+username+"'",null);
+
+        return result==1;
     }
 
     /**
@@ -194,19 +189,15 @@ public class DBHelper extends SQLiteOpenHelper {
      * @return true if email has been changed and vice versa
      */
     public boolean changeEmail(String username,String newEmail){
-        boolean result=false;
+        int result=0;
         SQLiteDatabase db;
         db=this.getWritableDatabase();
-            final String updateEmail="UPDATE " + USERS_TABLE_NAME + " SET "
-                    + USERS_COLUMN_EMAIL + " = '" + newEmail + "' WHERE "
-                    + USERS_COLUMN_USERNAME + " = '" + username + "'";
-            Cursor c=db.rawQuery(updateEmail,null);
-            if (c != null) {
-                if (c.getCount() > 0) {
-                    result = true;
-                }
-            }
-        return result;
+        ContentValues contentValues=new ContentValues();
+
+        contentValues.put(USERS_COLUMN_EMAIL,newEmail);
+
+        result=db.update(USERS_TABLE_NAME,contentValues,USERS_COLUMN_USERNAME+"='"+username+"'",null);
+        return result==1;
     }
 
     /**
@@ -215,21 +206,18 @@ public class DBHelper extends SQLiteOpenHelper {
      * of @param username
      * @return true if successful and vice versa
      */
-    public boolean updateFinances(String username,int annualIncome,int desiredSaving, int maximumDailyExpense){
-        boolean result=false;
+    public boolean updateFinances(String username, int annualIncome, int desiredSaving, int maximumDailyExpense){
+        int result=0;
         SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
+        ContentValues contentValues=new ContentValues();
+        contentValues.put(USERS_COLUMN_ANNUAL_INCOME,annualIncome);
+        contentValues.put(USERS_COLUMN_DESIRED_SAVING,desiredSaving);
+        contentValues.put(USERS_COLUMN_MAXIMUM_DAILY_EXPENSE,maximumDailyExpense);
 
-        final String updateAmounts="UPDATE " + USERS_TABLE_NAME + " SET "
-                +USERS_COLUMN_ANNUAL_INCOME + " = " + annualIncome + " , "
-                +USERS_COLUMN_DESIRED_SAVING+ " = " + desiredSaving+ " , "
-                +USERS_COLUMN_MAXIMUM_DAILY_EXPENSE + " = " + maximumDailyExpense + " "
-                +" WHERE " + USERS_COLUMN_USERNAME + " = '" +username + "'";
-        Cursor c = sqLiteDatabase.rawQuery(updateAmounts, null);
+        result=sqLiteDatabase.update(USERS_TABLE_NAME,contentValues,USERS_COLUMN_USERNAME+"='"+username+"'",null);
 
-        if (c != null && (c.getCount() > 0)) {
-            result = true;
-        }
-        return result;
+
+        return result==1;
     }
 
     /**
