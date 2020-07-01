@@ -9,7 +9,7 @@
     <string name="hint_search_for_an_expense">Search for an savedExpense</string>
     <string name="hint_add_your_annual_expense_here">Add your Annual savedExpense here</string>
     <string name="hint_add_your_daily_expense_here">Add your daily savedExpense here</string>
-    <string name="hint_list_of_expense_items">List of savedExpense items</string>
+    <string name="hint_list_of_expense_items">List of Saved Expense items</string>
     <string name="nameerror">Name Cannot be empty</string>
     <string name="emailerror">Enter a valid email address.</string>
     <string name="mobileerror">Enter a valid phone number</string>
