@@ -5,6 +5,7 @@ package com.expensetracker.ui.settings;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,8 +26,6 @@ import com.expensetracker.R;
 import com.expensetracker.User;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import java.lang.ref.WeakReference;
-import java.text.ParseException;
 import java.util.List;
 
 import static android.content.Context.MODE_PRIVATE;
@@ -68,17 +67,41 @@ public class SettingsFragment extends Fragment {
             boolean result;
             @Override
             public void onClick(View v) {
-                result=mDBHelper.updateFinances(username,Integer.parseInt(String.valueOf(mEdtAnnualIncome.getText()))
-                        ,Integer.parseInt(String.valueOf(mEdtDesiredSaving.getText()))
-                        ,Integer.parseInt(String.valueOf(mEdtMaximumDailyExpense.getText())));
-                if(result)
-                    Toast.makeText(getContext(),"Update is successful",Toast.LENGTH_LONG).show();
-                else
-                    Toast.makeText(getContext(),"Update failed",Toast.LENGTH_LONG).show();
-                userDetails=mDBHelper.fetchUserDetails(username);
-                mEdtDesiredSaving.setText(String.valueOf(userDetails.getDesiredSaving()));
-                mEdtAnnualIncome.setText(String.valueOf(userDetails.getAnnualIncome()));
-                mEdtMaximumDailyExpense.setText(String.valueOf(userDetails.getMaximumDailyExpense()));
+                if(TextUtils.isEmpty(String.valueOf(mEdtAnnualIncome.getText()))){
+                    mEdtAnnualIncome.setError("This field cannot be empty");
+                }
+                else if(TextUtils.isEmpty(String.valueOf(mEdtDesiredSaving.getText()))){
+                    mEdtDesiredSaving.setError("This field cannot be empty");
+                }
+                else if(TextUtils.isEmpty(String.valueOf(mEdtMaximumDailyExpense.getText()))){
+                    mEdtMaximumDailyExpense.setError("This field cannot be empty");
+                }
+                else {
+                    int annualIncome = Integer.parseInt(String.valueOf(mEdtAnnualIncome.getText()));
+                    int desiredSaving = Integer.parseInt(String.valueOf(mEdtDesiredSaving.getText()));
+                    int maximumDailyExpense = Integer.parseInt(String.valueOf(mEdtMaximumDailyExpense.getText()));
+                    if (annualIncome <= 0) {
+                        mEdtAnnualIncome.setError("Please enter a positive number");
+                    } else if (desiredSaving <= 0) {
+                        mEdtDesiredSaving.setError("Please enter a positive number");
+                    } else if (maximumDailyExpense < 0) {
+                        mEdtMaximumDailyExpense.setError("Please enter a non - negative number");
+                    } else if ((annualIncome - maximumDailyExpense * 365) <= desiredSaving) {
+                        mEdtMaximumDailyExpense.setError("Adjust your maximum daily expense or savings goal");
+                    } else {
+                        result = mDBHelper.updateFinances(username, Integer.parseInt(String.valueOf(mEdtAnnualIncome.getText()))
+                                , Integer.parseInt(String.valueOf(mEdtDesiredSaving.getText()))
+                                , Integer.parseInt(String.valueOf(mEdtMaximumDailyExpense.getText())));
+                        if (result)
+                            Toast.makeText(getContext(), "Update is successful", Toast.LENGTH_LONG).show();
+                        else
+                            Toast.makeText(getContext(), "Update failed", Toast.LENGTH_LONG).show();
+                        userDetails = mDBHelper.fetchUserDetails(username);
+                        mEdtDesiredSaving.setText(String.valueOf(userDetails.getDesiredSaving()));
+                        mEdtAnnualIncome.setText(String.valueOf(userDetails.getAnnualIncome()));
+                        mEdtMaximumDailyExpense.setText(String.valueOf(userDetails.getMaximumDailyExpense()));
+                    }
+                }
             }
         });
 
