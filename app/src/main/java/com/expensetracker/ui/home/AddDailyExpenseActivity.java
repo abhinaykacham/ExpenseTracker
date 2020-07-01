@@ -6,6 +6,7 @@ import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -103,53 +104,59 @@ public class AddDailyExpenseActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 expenseType = (Expense) mDailyExpenseSpinner.getSelectedItem();
-                if (activityType.equals("UPDATE_DAILY_EXPENSE")) {
-                    expenseFromPrevious.setExpenseAmount(Integer.valueOf(String.valueOf(mDailyExpenseAmount.getText())));
-                    int status = mDBHelper.updateExpense(expenseFromPrevious);
-                    if (status > 0) {
-                        Log.d(TAG, "Daily expense updated!!");
-                        onBackPressed();
+                if (!TextUtils.isEmpty(String.valueOf(mDailyExpenseAmount.getText())) && Integer.valueOf(String.valueOf(mDailyExpenseAmount.getText()))>0) {
+                    if (activityType.equals("UPDATE_DAILY_EXPENSE")) {
+                        expenseFromPrevious.setExpenseAmount(Integer.valueOf(String.valueOf(mDailyExpenseAmount.getText())));
+                        int status = mDBHelper.updateExpense(expenseFromPrevious);
+                        if (status > 0) {
+                            Log.d(TAG, "Daily expense updated!!");
+                            onBackPressed();
+                        } else {
+                            Toast.makeText(
+                                    getApplicationContext()
+                                    , "Expense Update failed"
+                                    , Toast.LENGTH_LONG
+                            ).show();
+                            Log.d(TAG, "Expense Update failed");
+                        }
+                    } else if (activityType.equals("UPDATE_SAVED_EXPENSE")) {
+                        expenseFromPrevious.setExpenseAmount(Integer.valueOf(String.valueOf(mDailyExpenseAmount.getText())));
+                        int status = mDBHelper.updateSavedExpense(expenseFromPrevious);
+                        if (status > 0) {
+                            Log.d(TAG, "Daily expense updated!!");
+                            onBackPressed();
+                        } else {
+                            Toast.makeText(
+                                    getApplicationContext()
+                                    , "Expense Update failed"
+                                    , Toast.LENGTH_LONG
+                            ).show();
+                            Log.d(TAG, "Expense Update failed");
+                        }
                     } else {
-                        Toast.makeText(
-                                getApplicationContext()
-                                , "Expense Update failed"
-                                , Toast.LENGTH_LONG
-                        ).show();
-                        Log.d(TAG, "Expense Update failed");
-                    }
-                } else if (activityType.equals("UPDATE_SAVED_EXPENSE")) {
-                    expenseFromPrevious.setExpenseAmount(Integer.valueOf(String.valueOf(mDailyExpenseAmount.getText())));
-                    int status = mDBHelper.updateSavedExpense(expenseFromPrevious);
-                    if (status > 0) {
-                        Log.d(TAG, "Daily expense updated!!");
-                        onBackPressed();
-                    } else {
-                        Toast.makeText(
-                                getApplicationContext()
-                                , "Expense Update failed"
-                                , Toast.LENGTH_LONG
-                        ).show();
-                        Log.d(TAG, "Expense Update failed");
-                    }
-                } else {
-                    dailyExpense = new Expense();
-                    dailyExpense.setSavedExpenseID(expenseType.getSavedExpenseID());
-                    dailyExpense.setExpenseAmount(Integer.valueOf(String.valueOf(mDailyExpenseAmount.getText())));
-                    dailyExpense.setCreatedDate(date);
-                    result = mDBHelper.addDailyExpense(dailyExpense);
-                    if (result) {
-                        Log.d(TAG, "Daily expense added!!");
-                        onBackPressed();
-                    } else {
-                        Toast.makeText(
-                                getApplicationContext()
-                                , "Expense addition failed"
-                                , Toast.LENGTH_LONG
-                        ).show();
-                        Log.d(TAG, "Expense addition failed");
+                        dailyExpense = new Expense();
+                        dailyExpense.setSavedExpenseID(expenseType.getSavedExpenseID());
+                        dailyExpense.setExpenseAmount(Integer.valueOf(String.valueOf(mDailyExpenseAmount.getText())));
+                        dailyExpense.setCreatedDate(date);
+                        result = mDBHelper.addDailyExpense(dailyExpense);
+                        if (result) {
+                            Log.d(TAG, "Daily expense added!!");
+                            onBackPressed();
+                        } else {
+                            Toast.makeText(
+                                    getApplicationContext()
+                                    , "Expense addition failed"
+                                    , Toast.LENGTH_LONG
+                            ).show();
+                            Log.d(TAG, "Expense addition failed");
+                        }
                     }
                 }
+                else{
+                    mDailyExpenseAmount.setError("Cannot be blank or non-positive number");
+                }
             }
+
         });
 
     }

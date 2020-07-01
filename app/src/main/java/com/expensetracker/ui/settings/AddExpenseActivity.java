@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -47,16 +48,22 @@ public class AddExpenseActivity extends AppCompatActivity {
         mBtnAddExpense.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                expense.setCreatedDate(date);
-                expense.setExpenseAmount(Integer.valueOf(String.valueOf(mExpenseAmount.getText())));
-                expense.setUsername(username);
-                expense.setExpenseName(String.valueOf(mExpenseName.getText()));
-                boolean result=mDBHelper.addSavedExpense(expense);
-                if(result)
-                    onBackPressed();
-                else
-                    Toast.makeText(getApplicationContext()
-                    ,"Data insertion failed",Toast.LENGTH_LONG).show();
+                if(TextUtils.isEmpty(String.valueOf(String.valueOf(mExpenseName.getText())))){
+                    mExpenseName.setError("This field cannot be empty");
+                }
+                else {
+                    expense.setCreatedDate(date);
+                    if(!TextUtils.isEmpty(String.valueOf(mExpenseAmount.getText())))
+                        expense.setExpenseAmount(Integer.valueOf(String.valueOf(mExpenseAmount.getText())));
+                    expense.setUsername(username);
+                    expense.setExpenseName(String.valueOf(mExpenseName.getText()));
+                    boolean result = mDBHelper.addSavedExpense(expense);
+                    if (result)
+                        onBackPressed();
+                    else
+                        Toast.makeText(getApplicationContext()
+                                , "Data insertion failed", Toast.LENGTH_LONG).show();
+                }
             }
         });
 
