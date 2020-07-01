@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -77,7 +76,11 @@ public class HomeFragment extends Fragment{
                 picker.show(getActivity().getSupportFragmentManager(), picker.toString());
             }
         });
-        progressBar.setProgress(mDBHelper.savingsProgress(username));
+        try {
+            progressBar.setProgress(mDBHelper.savingsProgress(username));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
 
         picker.addOnPositiveButtonClickListener(new MaterialPickerOnPositiveButtonClickListener() {
             @Override
@@ -91,7 +94,7 @@ public class HomeFragment extends Fragment{
                 dailyExpensesRecyclerView.setAdapter(new ListOfExpensesAdapter((HomeScreenActivity) getActivity()
                         ,dailyExpense,datePicked));
 
-                String dailySum="Total Expenses of Selected Date("+datePicked+"): "+ mDBHelper.sumOfExpensesToday(username,datePicked);
+                String dailySum="Savings of Selected Date("+datePicked+"): "+ mDBHelper.totalSavingsofADay(username,datePicked);
                 dailyExpenseStatus.setText(dailySum);
             }
         });
@@ -102,9 +105,14 @@ public class HomeFragment extends Fragment{
     public void onResume() {
         super.onResume();
         dailyExpensesRecyclerView.setAdapter(new ListOfExpensesAdapter((HomeScreenActivity) getActivity(),dailyExpense,date));
-        String dailySum="Total Expenses of Selected Date("+date+"): "+ mDBHelper.sumOfExpensesToday(username,date);
+        String dailySum="Savings of Selected Date("+date+"): "+ mDBHelper.totalSavingsofADay(username,date);
         dailyExpenseStatus.setText(dailySum);
-        progressBar.setProgress(mDBHelper.savingsProgress(username));
+        try {
+            progressBar.setProgress(mDBHelper.savingsProgress(username));
+            progressBar.setTooltipText("Savings Till date: "+String.valueOf(mDBHelper.totalSavingsTilldate(username)));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
 
     }
 
