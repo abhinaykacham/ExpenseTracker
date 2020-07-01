@@ -20,9 +20,9 @@
 
     <TextView
         android:id="@+id/totalDailyExpense"
-        android:layout_width="411dp"
+        android:layout_width="0dp"
         android:layout_height="26dp"
-        android:textSize="14sp"
+        android:textSize="18sp"
         app:layout_constraintBottom_toTopOf="@id/header"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/view" />
@@ -44,7 +44,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
-                android:layout_marginLeft="42dp"
+                android:layout_marginLeft="135dp"
                 android:gravity="center"
                 android:text="Expense Amount" />
 
@@ -58,7 +58,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginRight="40dp"
+                    android:layout_marginRight="90dp"
                     android:gravity="end"
                     android:text="Expense Type" />
 

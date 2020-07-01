@@ -91,7 +91,7 @@ public class HomeFragment extends Fragment{
                 dailyExpensesRecyclerView.setAdapter(new ListOfExpensesAdapter((HomeScreenActivity) getActivity()
                         ,dailyExpense,datePicked));
 
-                String dailySum="Total Expenses of today: "+ mDBHelper.sumOfExpensesToday(username,datePicked);
+                String dailySum="Total Expenses of Selected Date("+datePicked+"): "+ mDBHelper.sumOfExpensesToday(username,datePicked);
                 dailyExpenseStatus.setText(dailySum);
             }
         });
@@ -102,7 +102,7 @@ public class HomeFragment extends Fragment{
     public void onResume() {
         super.onResume();
         dailyExpensesRecyclerView.setAdapter(new ListOfExpensesAdapter((HomeScreenActivity) getActivity(),dailyExpense,date));
-        String dailySum="Total Expenses of today: "+ mDBHelper.sumOfExpensesToday(username,date);
+        String dailySum="Total Expenses of Selected Date("+date+"): "+ mDBHelper.sumOfExpensesToday(username,date);
         dailyExpenseStatus.setText(dailySum);
         progressBar.setProgress(mDBHelper.savingsProgress(username));
 
