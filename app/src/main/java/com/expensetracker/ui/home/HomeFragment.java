@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -62,9 +63,13 @@ public class HomeFragment extends Fragment{
         progressBar=root.findViewById(R.id.savingsProgressBar);
         addDailyExpenseButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                Intent intent=new Intent(getActivity(), AddDailyExpenseActivity.class);
-                intent.putExtra("ACTIVITY_TYPE","INSERT_DAILY_SAVED");
-                startActivity(intent);
+                if(mDBHelper.totalnoOfSavedExpenses(username)==0) {
+                    Toast.makeText(getContext(),"Add minimum of one saved expense in your settings",Toast.LENGTH_LONG).show();
+                }else{
+                    Intent intent=new Intent(getActivity(), AddDailyExpenseActivity.class);
+                    intent.putExtra("ACTIVITY_TYPE","INSERT_DAILY_SAVED");
+                    startActivity(intent);
+                }
 
             }
         });
@@ -82,6 +87,7 @@ public class HomeFragment extends Fragment{
             e.printStackTrace();
         }
 
+
         picker.addOnPositiveButtonClickListener(new MaterialPickerOnPositiveButtonClickListener() {
             @Override
             public void onPositiveButtonClick(Object selection) {
@@ -94,7 +100,23 @@ public class HomeFragment extends Fragment{
                 dailyExpensesRecyclerView.setAdapter(new ListOfExpensesAdapter((HomeScreenActivity) getActivity()
                         ,dailyExpense,datePicked));
 
-                String dailySum="Savings of Selected Date("+datePicked+"): "+ mDBHelper.totalSavingsofADay(username,datePicked);
+                String dailySum="Savings of Selected Date("+datePicked+"): "+ mDBHelper.totalSavingsofADay(username,datePicked)+"\n";
+                int deviation=0;
+                try {
+                    deviation=mDBHelper.deviationFromCumulativeTarget(username);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                if(deviation>0){
+                    dailySum+="\nYou are ahead of your cumulative savings target by "+deviation +". Hurray!!"+"\n";
+                }
+                else if(deviation==0){
+                    dailySum+="\nBulls eye!! You have exactly reached your cumulative savings target"+"\n";;
+                }
+                else{
+                    dailySum+="\nYou have backlog of target savings by "+deviation+ ".\nPlease adjust your expenses accordingly"+"\n";;
+                }
+
                 dailyExpenseStatus.setText(dailySum);
             }
         });
@@ -104,8 +126,23 @@ public class HomeFragment extends Fragment{
     @Override
     public void onResume() {
         super.onResume();
+        int deviation=0;
+        try {
+            deviation=mDBHelper.deviationFromCumulativeTarget(username);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
         dailyExpensesRecyclerView.setAdapter(new ListOfExpensesAdapter((HomeScreenActivity) getActivity(),dailyExpense,date));
-        String dailySum="Savings of Selected Date("+date+"): "+ mDBHelper.totalSavingsofADay(username,date);
+        String dailySum="Savings of Selected Date("+date+"): "+ mDBHelper.totalSavingsofADay(username,date)+"\n";
+        if(deviation>0){
+            dailySum+="\nYou are ahead of your cumulative savings target by "+deviation +". Hurray!!"+"\n";
+        }
+        else if(deviation==0){
+            dailySum+="\nBulls eye!! You have exactly reached your cumulative savings target"+"\n";;
+        }
+        else{
+            dailySum+="\nYou have backlog of target savings by "+deviation+ ".\nPlease adjust your expenses accordingly"+"\n";;
+        }
         dailyExpenseStatus.setText(dailySum);
         try {
             progressBar.setProgress(mDBHelper.savingsProgress(username));
@@ -114,6 +151,9 @@ public class HomeFragment extends Fragment{
             e.printStackTrace();
         }
 
+        if(mDBHelper.totalExpensesTilldate(username)==0){
+            dailyExpenseStatus.setText("It is idle here add daily expenses by tapping + at bottom of screen");
+        }
     }
 
 }
